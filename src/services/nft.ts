@@ -1,4 +1,4 @@
-import { TonClient, Address } from '@ton/ton';
+import { TonClient } from '@ton/ton';
 import { SUPPORTED_COLLECTIONS, NFT } from '../types/nft';
 
 // Локальное хранилище для фарминга
@@ -11,11 +11,11 @@ interface FarmingState {
 }
 
 class NFTService {
-  private client: TonClient;
   private farmingState: FarmingState = {};
+  private tonClient: TonClient;
 
   constructor() {
-    this.client = new TonClient({
+    this.tonClient = new TonClient({
       endpoint: import.meta.env.VITE_TON_ENDPOINT,
       apiKey: import.meta.env.VITE_TON_API_KEY,
     });

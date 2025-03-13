@@ -22,14 +22,6 @@ const ConnectButton = styled.button`
   }
 `;
 
-const WalletInfo = styled.div`
-  text-align: center;
-  margin: 10px 0;
-  padding: 10px;
-  background-color: var(--tg-theme-secondary-bg-color, #f0f0f0);
-  border-radius: var(--border-radius);
-`;
-
 const ErrorMessage = styled.div`
   color: #ff4444;
   text-align: center;
@@ -48,7 +40,6 @@ const WalletConnect: React.FC = () => {
   useEffect(() => {
     const checkConnection = async () => {
       try {
-        // Пытаемся восстановить соединение
         await tonConnectUI.connectionRestored;
         
         if (tonConnectUI.connected) {
@@ -69,13 +60,11 @@ const WalletConnect: React.FC = () => {
       setIsLoading(true);
       setError(null);
 
-      // Если кошелек уже подключен, просто перенаправляем
       if (tonConnectUI.connected) {
         navigate('/dashboard');
         return;
       }
 
-      // Подключаем кошелек
       await tonConnectUI.connectWallet();
       navigate('/dashboard');
     } catch (err) {
@@ -86,24 +75,6 @@ const WalletConnect: React.FC = () => {
     }
   };
 
-  const handleDisconnect = async () => {
-    try {
-      if (isLoading) return;
-      
-      setIsLoading(true);
-      setError(null);
-      await tonConnectUI.disconnect();
-      // После отключения возвращаемся на страницу подключения
-      navigate('/');
-    } catch (err) {
-      console.error('Ошибка отключения кошелька:', err);
-      setError('Не удалось отключить кошелек. Пожалуйста, попробуйте еще раз.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Если кошелек подключен, не показываем этот компонент
   if (tonConnectUI.connected) {
     return null;
   }
