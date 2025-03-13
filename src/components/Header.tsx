@@ -8,9 +8,9 @@ const Header: React.FC<HeaderProps> = ({ onDisconnect }) => {
   const { wallet } = useTonConnect();
 
   return (
-    <div className="backdrop-blur-lg bg-white/5 border-b border-white/10 mb-4 sm:mb-6">
-      <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-0">
+    <div className="backdrop-blur-lg bg-white/5 border-b border-white/10 mb-4 sm:mb-6 w-full">
+      <div className="w-full px-3 sm:px-4 py-3 sm:py-4">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-0 max-w-7xl mx-auto">
           {/* Кошелек слева */}
           <div className="flex items-center space-x-3 sm:space-x-4 w-full sm:w-auto justify-between sm:justify-start">
             <div className="text-xs sm:text-sm text-gray-300">

@@ -46,8 +46,8 @@ const StatsPanel: React.FC<StatsPanelProps> = ({
   }, [totalGift]);
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-      <div className="backdrop-blur-md bg-black/30 rounded-xl p-3 sm:p-4 text-center relative overflow-hidden border border-white/5 hover:border-blue-500/30 transition-all duration-300 group">
+    <div className="grid grid-cols-3 gap-2 sm:gap-4">
+      <div className="backdrop-blur-md bg-black/30 rounded-xl p-2 sm:p-4 text-center relative overflow-hidden border border-white/5 hover:border-blue-500/30 transition-all duration-300 group">
         <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-purple-500/5 group-hover:from-blue-500/10 group-hover:to-purple-500/10 transition-all duration-300"></div>
         <p className="text-xs sm:text-sm text-gray-400 mb-1.5 sm:mb-2 relative z-10">Баланс GIFT</p>
         <div className="flex flex-col relative z-10">
@@ -66,7 +66,7 @@ const StatsPanel: React.FC<StatsPanelProps> = ({
           )}
         </div>
       </div>
-      <div className="backdrop-blur-md bg-black/30 rounded-xl p-3 sm:p-4 text-center relative overflow-hidden border border-white/5 hover:border-blue-500/30 transition-all duration-300 group">
+      <div className="backdrop-blur-md bg-black/30 rounded-xl p-2 sm:p-4 text-center relative overflow-hidden border border-white/5 hover:border-blue-500/30 transition-all duration-300 group">
         <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-purple-500/5 group-hover:from-blue-500/10 group-hover:to-purple-500/10 transition-all duration-300"></div>
         <p className="text-xs sm:text-sm text-gray-400 mb-1.5 sm:mb-2 relative z-10">Всего NFT</p>
         <div className="flex items-center justify-center relative z-10">
@@ -79,7 +79,7 @@ const StatsPanel: React.FC<StatsPanelProps> = ({
           </svg>
         </div>
       </div>
-      <div className="backdrop-blur-md bg-black/30 rounded-xl p-3 sm:p-4 text-center relative overflow-hidden border border-white/5 hover:border-blue-500/30 transition-all duration-300 group">
+      <div className="backdrop-blur-md bg-black/30 rounded-xl p-2 sm:p-4 text-center relative overflow-hidden border border-white/5 hover:border-blue-500/30 transition-all duration-300 group">
         <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-purple-500/5 group-hover:from-blue-500/10 group-hover:to-purple-500/10 transition-all duration-300"></div>
         <p className="text-xs sm:text-sm text-gray-400 mb-1.5 sm:mb-2 relative z-10">Фармится</p>
         <div className="flex items-center justify-center relative z-10">
