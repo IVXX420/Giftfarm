@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useTonConnect } from '../hooks/useTonConnect';
 import { useTonConnectUI } from '@tonconnect/ui-react';
 import NFTService from '../services/nft';
@@ -13,7 +12,6 @@ import Header from './Header';
 import { toast } from 'react-toastify';
 
 const Dashboard: React.FC = () => {
-  const navigate = useNavigate();
   const { connected, wallet } = useTonConnect();
   const [tonConnectUI] = useTonConnectUI();
   const [nfts, setNfts] = useState<NFT[]>([]);
@@ -22,6 +20,10 @@ const Dashboard: React.FC = () => {
   const [selectedTab, setSelectedTab] = useState<'all' | 'farming'>('all');
   const [isConnecting, setIsConnecting] = useState<boolean>(false);
   const [isSubscribed, setIsSubscribed] = useState<boolean>(false);
+  const [isTelegramWebView] = useState(() => {
+    const w = window as Window & typeof globalThis & { Telegram?: { WebApp: any } };
+    return w.Telegram?.WebApp !== undefined;
+  });
 
   // Загрузка NFT
   const loadNFTs = async () => {
@@ -51,7 +53,7 @@ const Dashboard: React.FC = () => {
     try {
       // Получаем накопленные GIFT с активных фармов
       const farmingTotal = await Promise.all(
-        nfts.map(nft => NFTService.getAccumulatedGift(nft.address))
+        nfts.map(nft => NFTService.getAccumulatedGift(nft.id))
       );
       // Получаем общий баланс GIFT
       const totalBalance = NFTService.getGiftBalance() + farmingTotal.reduce((sum, amount) => sum + amount, 0);
@@ -65,7 +67,7 @@ const Dashboard: React.FC = () => {
   const updateNFTState = (nftAddress: string, isStaking: boolean) => {
     setNfts(prevNfts => 
       prevNfts.map(nft => 
-        nft.address === nftAddress 
+        nft.id === nftAddress 
           ? { ...nft, isStaking, stakingStartTime: isStaking ? Date.now() : 0 }
           : nft
       )
@@ -90,7 +92,7 @@ const Dashboard: React.FC = () => {
       // Обновляем только те NFT, которые не были в процессе фарминга
       setNfts(prevNfts => 
         prevNfts.map(nft => {
-          const farmingData = NFTService.getFarmingState(nft.address);
+          const farmingData = NFTService.getFarmingState(nft.id);
           return farmingData?.isStaking
             ? { ...nft, isStaking: true, stakingStartTime: farmingData.startTime }
             : nft;
@@ -110,7 +112,7 @@ const Dashboard: React.FC = () => {
         // Обновляем только те NFT, с которых собрали награду
         setNfts(prevNfts => 
           prevNfts.map(nft => {
-            const farmingData = NFTService.getFarmingState(nft.address);
+            const farmingData = NFTService.getFarmingState(nft.id);
             return !farmingData?.isStaking
               ? { ...nft, isStaking: false, stakingStartTime: 0 }
               : nft;
@@ -149,9 +151,15 @@ const Dashboard: React.FC = () => {
     try {
       setIsConnecting(true);
       await tonConnectUI.connectWallet();
-      navigate('/dashboard');
+      // Убираем навигацию, так как она может вызывать проблемы в Telegram WebView
+      // navigate('/dashboard');
     } catch (error) {
       console.error('Ошибка подключения:', error);
+      toast.error('Ошибка при подключении кошелька 😢', {
+        className: 'toast-base animate-fade-in-up',
+        position: 'top-right',
+        autoClose: 3000
+      });
     } finally {
       setIsConnecting(false);
     }
@@ -173,6 +181,22 @@ const Dashboard: React.FC = () => {
       });
     }
   };
+
+  useEffect(() => {
+    // Настраиваем Telegram WebApp если приложение открыто в Telegram
+    if (isTelegramWebView) {
+      const w = window as Window & typeof globalThis & { Telegram?: { WebApp: any } };
+      const tg = w.Telegram?.WebApp;
+      if (tg) {
+        tg.ready();
+        tg.expand();
+        
+        // Устанавливаем цвета для WebApp
+        tg.setHeaderColor('#1a1b1e');
+        tg.setBackgroundColor('#0f1114');
+      }
+    }
+  }, [isTelegramWebView]);
 
   if (!connected) {
     return (
@@ -280,25 +304,24 @@ const Dashboard: React.FC = () => {
         {!isLoading && nfts.length > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
             {(selectedTab === 'all' ? nfts : farmingNFTs).map((nft, index) => (
-              <div key={nft.address} 
+              <div key={nft.id} 
                 className="animate-fadeIn" 
                 style={{ animationDelay: `${index * 100}ms` }}
               >
                 <NFTCard 
-                  id={nft.id}
-                  name={nft.metadata.name}
-                  image={nft.metadata.image}
-                  collection={nft.metadata.attributes.find(attr => attr.trait_type === 'Collection')?.value || 'Unknown Collection'}
+                  name={nft.name}
+                  image={nft.image}
+                  collection={nft.collection}
                   isFarming={nft.isStaking}
                   farmingEndTime={nft.stakingStartTime ? nft.stakingStartTime + 12 * 60 * 60 * 1000 : undefined}
                   onStartFarming={async () => {
-                    await NFTService.startFarming(nft.address);
-                    updateNFTState(nft.address, true);
+                    await NFTService.startFarming(nft.id);
+                    updateNFTState(nft.id, true);
                     updateTotalGift();
                   }}
                   onCollectReward={async () => {
-                    await NFTService.collectReward(nft.address);
-                    updateNFTState(nft.address, false);
+                    await NFTService.collectReward(nft.id);
+                    updateNFTState(nft.id, false);
                     updateTotalGift();
                   }}
                 />

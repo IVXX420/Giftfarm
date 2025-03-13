@@ -1,0 +1,93 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary-color: #0088cc;
+  --secondary-color: #1a1b1e;
+  --background-color: #0f1114;
+  --text-color: #ffffff;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+/* Стили для Telegram WebApp */
+.telegram-webapp {
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+/* Стили для кнопок */
+.button-base {
+  @apply bg-blue-600 text-white rounded-lg px-4 py-2 font-medium transition-all duration-300 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50;
+}
+
+/* Стили для карточек */
+.glass-panel {
+  @apply bg-gray-800 bg-opacity-50 backdrop-blur-lg rounded-xl border border-gray-700 shadow-lg;
+}
+
+/* Стили для градиентного текста */
+.gradient-text {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500;
+}
+
+/* Стили для анимаций */
+.hover-scale {
+  @apply transform transition-transform duration-300 hover:scale-105;
+}
+
+.shadow-glow {
+  @apply shadow-lg shadow-blue-500/20;
+}
+
+/* Стили для уведомлений */
+.toast-container {
+  @apply z-50;
+}
+
+.toast-base {
+  @apply bg-gray-800 text-white border border-gray-700 shadow-lg;
+}
+
+/* Стили для загрузки */
+.animate-bounce-sm {
+  animation: bounce 1s infinite;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(-5%);
+  }
+  50% {
+    transform: translateY(0);
+  }
+}
+
+/* Стили для градиентного фона */
+.animate-gradient {
+  background: linear-gradient(-45deg, #1a1b1e, #0f1114, #1a1b1e, #0f1114);
+  background-size: 400% 400%;
+  animation: gradient 15s ease infinite;
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+} 
