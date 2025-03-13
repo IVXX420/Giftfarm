@@ -1,50 +1,45 @@
+import PaymentService from './payment';
+import { useTonConnectUI } from '@tonconnect/ui-react';
+
 class SubscriptionService {
-  private subscriptionKey = 'gift_farm_subscription';
-  private multiplier = 1.5;
+  private static FARMING_MULTIPLIER = 1.5;
 
-  constructor() {
-    this.loadSubscriptionState();
+  // Получить множитель фарминга
+  static getFarmingMultiplier(): number {
+    return this.isSubscribed() ? this.FARMING_MULTIPLIER : 1;
   }
 
-  private loadSubscriptionState() {
-    const savedState = localStorage.getItem(this.subscriptionKey);
-    if (savedState) {
-      const { expiresAt } = JSON.parse(savedState);
-      if (expiresAt && new Date(expiresAt).getTime() < Date.now()) {
-        localStorage.removeItem(this.subscriptionKey);
+  // Проверить статус подписки
+  static isSubscribed(): boolean {
+    return PaymentService.isSubscriptionActive();
+  }
+
+  // Получить информацию о подписке
+  static getSubscriptionInfo() {
+    return PaymentService.getSubscriptionInfo();
+  }
+
+  // Оформить подписку
+  static async subscribe(tonConnect: any) {
+    try {
+      // Создаем транзакцию для оплаты
+      const transaction = await PaymentService.createSubscriptionPayment();
+
+      // Отправляем транзакцию через TON Connect
+      const result = await tonConnect.sendTransaction(transaction);
+
+      if (result.success) {
+        // Если транзакция успешна, активируем подписку
+        PaymentService.activateSubscription();
+        return true;
       }
+
+      return false;
+    } catch (error) {
+      console.error('Ошибка при оформлении подписки:', error);
+      throw error;
     }
-  }
-
-  isSubscribed(): boolean {
-    const savedState = localStorage.getItem(this.subscriptionKey);
-    if (!savedState) return false;
-
-    const { expiresAt } = JSON.parse(savedState);
-    return new Date(expiresAt).getTime() > Date.now();
-  }
-
-  async subscribe(): Promise<void> {
-    // В будущем здесь будет реальная оплата через TON
-    const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + 30); // Подписка на 30 дней
-
-    localStorage.setItem(this.subscriptionKey, JSON.stringify({
-      expiresAt: expiresAt.toISOString()
-    }));
-  }
-
-  getFarmingMultiplier(): number {
-    return this.isSubscribed() ? this.multiplier : 1;
-  }
-
-  getSubscriptionEndDate(): Date | null {
-    const savedState = localStorage.getItem(this.subscriptionKey);
-    if (!savedState) return null;
-
-    const { expiresAt } = JSON.parse(savedState);
-    return new Date(expiresAt);
   }
 }
 
-export default new SubscriptionService(); 
+export default SubscriptionService; 
