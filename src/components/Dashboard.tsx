@@ -3,8 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { useTonConnect } from '../hooks/useTonConnect';
 import { useTonConnectUI } from '@tonconnect/ui-react';
 import NFTService from '../services/nft';
+import SubscriptionService from '../services/subscription';
 import { NFT } from '../types/nft';
 import NFTCard from './NFTCard';
+import SubscriptionPanel from './SubscriptionPanel';
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -15,6 +17,7 @@ const Dashboard: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [selectedTab, setSelectedTab] = useState<'all' | 'farming'>('all');
   const [isConnecting, setIsConnecting] = useState<boolean>(false);
+  const [isSubscribed, setIsSubscribed] = useState<boolean>(false);
 
   // Загрузка NFT
   const loadNFTs = async () => {
@@ -57,10 +60,55 @@ const Dashboard: React.FC = () => {
     );
   };
 
+  // Подписка на премиум
+  const handleSubscribe = async () => {
+    try {
+      await SubscriptionService.subscribe();
+      setIsSubscribed(SubscriptionService.isSubscribed());
+    } catch (error) {
+      console.error('Ошибка при оформлении подписки:', error);
+    }
+  };
+
+  // Запуск фарминга для всех NFT
+  const handleStartAllFarming = async () => {
+    try {
+      await NFTService.startAllFarming(nfts);
+      setNfts(prevNfts => 
+        prevNfts.map(nft => ({
+          ...nft,
+          isStaking: true,
+          stakingStartTime: Date.now()
+        }))
+      );
+      updateTotalGift();
+    } catch (error) {
+      console.error('Ошибка при запуске всех NFT:', error);
+    }
+  };
+
+  // Сбор наград со всех NFT
+  const handleCollectAllRewards = async () => {
+    try {
+      await NFTService.collectAllRewards(nfts);
+      setNfts(prevNfts => 
+        prevNfts.map(nft => ({
+          ...nft,
+          isStaking: false,
+          stakingStartTime: 0
+        }))
+      );
+      updateTotalGift();
+    } catch (error) {
+      console.error('Ошибка при сборе всех наград:', error);
+    }
+  };
+
   useEffect(() => {
     if (connected && wallet?.address) {
       console.log('Кошелек подключен:', wallet.address);
       loadNFTs();
+      setIsSubscribed(SubscriptionService.isSubscribed());
     } else {
       console.log('Кошелек не подключен');
     }
@@ -180,6 +228,16 @@ const Dashboard: React.FC = () => {
             </div>
           </div>
         </div>
+
+        {/* Панель подписки */}
+        <SubscriptionPanel
+          isSubscribed={isSubscribed}
+          onSubscribe={handleSubscribe}
+          onStartAllFarming={handleStartAllFarming}
+          onCollectAllRewards={handleCollectAllRewards}
+          farmingCount={farmingNFTs.length}
+          totalNFTs={nfts.length}
+        />
 
         {/* Табы */}
         <div className="flex space-x-2 sm:space-x-4 mb-4 sm:mb-6">

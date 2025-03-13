@@ -1,5 +1,6 @@
 import { SUPPORTED_COLLECTIONS, NFT } from '../types/nft';
 import { Address } from '@ton/core';
+import SubscriptionService from './subscription';
 
 class NFTService {
   private farmingState: { [key: string]: { isStaking: boolean; startTime: number } } = {};
@@ -186,7 +187,7 @@ class NFTService {
     const now = Date.now();
     const elapsedHours = (now - farmingData.startTime) / (1000 * 60 * 60);
     const maxHours = 12;
-    const hourlyRate = 1;
+    const hourlyRate = 1 * SubscriptionService.getFarmingMultiplier();
 
     return Math.min(elapsedHours * hourlyRate, maxHours * hourlyRate);
   }
@@ -198,6 +199,27 @@ class NFTService {
       startTime: isStaking ? Date.now() : 0
     };
     this.saveFarmingState();
+  }
+
+  // Запустить фарминг для всех NFT
+  async startAllFarming(nfts: NFT[]): Promise<void> {
+    for (const nft of nfts) {
+      if (!this.farmingState[nft.address]?.isStaking) {
+        await this.startFarming(nft.address);
+      }
+    }
+  }
+
+  // Собрать награды со всех NFT
+  async collectAllRewards(nfts: NFT[]): Promise<number> {
+    let totalRewards = 0;
+    for (const nft of nfts) {
+      if (this.farmingState[nft.address]?.isStaking) {
+        const reward = await this.collectReward(nft.address);
+        totalRewards += reward;
+      }
+    }
+    return totalRewards;
   }
 }
 
