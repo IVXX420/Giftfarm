@@ -1,7 +1,7 @@
 import { TonConnect } from '@tonconnect/sdk';
 
 // Конфигурация TON Connect
-const manifestUrl = import.meta.env.VITE_MANIFEST_URL;
+export const manifestUrl = import.meta.env.VITE_MANIFEST_URL;
 
 // Создаем экземпляр TON Connect
 export const tonConnect = new TonConnect({

@@ -1,18 +1,38 @@
-export interface NFTCollection {
-  address: string;
-  name: string;
+export interface NFTAttribute {
+  trait_type?: string;
+  name?: string;
+  value: string;
 }
 
 export interface NFTMetadata {
   name: string;
   image: string;
+  description?: string;
+  attributes?: NFTAttribute[];
+  background?: {
+    color?: string;
+    pattern?: string;
+    image?: string;
+  };
+}
+
+export interface NFTCollection {
+  address: string;
+  name: string;
 }
 
 export interface NFT {
   address: string;
+  collectionAddress: string;
   metadata: NFTMetadata;
   isStaking: boolean;
   stakingStartTime: number;
+}
+
+export interface NFTBackground {
+  color: string;
+  pattern?: string;
+  image?: string;
 }
 
 // Поддерживаемые коллекции NFT

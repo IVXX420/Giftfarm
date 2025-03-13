@@ -12,6 +12,14 @@
   body {
     @apply m-0 min-h-screen text-white;
     background: linear-gradient(to bottom right, #111827, #1e3a8a, #111827);
+    transition: background-image 0.5s ease-in-out;
+  }
+
+  body.custom-background {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
   }
 }
 
