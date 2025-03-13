@@ -77,7 +77,15 @@ class NFTService {
   // Собрать награды со всех NFT
   async collectAllRewards(nfts: NFT[]): Promise<number> {
     let totalRewards = 0;
-    const readyToCollect = nfts.filter(nft => this.canCollectReward(nft.address));
+    // Фильтруем только те NFT, с которых можно собрать награду
+    const readyToCollect = nfts.filter(nft => {
+      const farmingData = this.farmingState[nft.address];
+      if (!farmingData?.isStaking) return false;
+      
+      const now = Date.now();
+      const elapsedHours = (now - farmingData.startTime) / (1000 * 60 * 60);
+      return elapsedHours >= 12;
+    });
     
     if (readyToCollect.length === 0) return 0;
 
@@ -256,11 +264,22 @@ class NFTService {
 
   // Запустить фарминг для всех NFT
   async startAllFarming(nfts: NFT[]): Promise<void> {
-    for (const nft of nfts) {
-      if (!this.farmingState[nft.address]?.isStaking) {
-        await this.startFarming(nft.address);
-      }
+    // Фильтруем только те NFT, которые не находятся в процессе фарминга
+    const availableForFarming = nfts.filter(nft => {
+      const farmingData = this.farmingState[nft.address];
+      return !farmingData?.isStaking;
+    });
+
+    if (availableForFarming.length === 0) return;
+
+    for (const nft of availableForFarming) {
+      await this.startFarming(nft.address);
     }
+  }
+
+  // Получить состояние фарминга для NFT
+  getFarmingState(nftAddress: string) {
+    return this.farmingState[nftAddress];
   }
 }
 

@@ -77,12 +77,14 @@ const Dashboard: React.FC = () => {
   const handleStartAllFarming = async () => {
     try {
       await NFTService.startAllFarming(nfts);
+      // Обновляем только те NFT, которые не были в процессе фарминга
       setNfts(prevNfts => 
-        prevNfts.map(nft => ({
-          ...nft,
-          isStaking: true,
-          stakingStartTime: Date.now()
-        }))
+        prevNfts.map(nft => {
+          const farmingData = NFTService.getFarmingState(nft.address);
+          return farmingData?.isStaking
+            ? { ...nft, isStaking: true, stakingStartTime: farmingData.startTime }
+            : nft;
+        })
       );
       updateTotalGift();
     } catch (error) {
@@ -93,15 +95,19 @@ const Dashboard: React.FC = () => {
   // Сбор наград со всех NFT
   const handleCollectAllRewards = async () => {
     try {
-      await NFTService.collectAllRewards(nfts);
-      setNfts(prevNfts => 
-        prevNfts.map(nft => ({
-          ...nft,
-          isStaking: false,
-          stakingStartTime: 0
-        }))
-      );
-      updateTotalGift();
+      const totalCollected = await NFTService.collectAllRewards(nfts);
+      if (totalCollected > 0) {
+        // Обновляем только те NFT, с которых собрали награду
+        setNfts(prevNfts => 
+          prevNfts.map(nft => {
+            const farmingData = NFTService.getFarmingState(nft.address);
+            return !farmingData?.isStaking
+              ? { ...nft, isStaking: false, stakingStartTime: 0 }
+              : nft;
+          })
+        );
+        updateTotalGift();
+      }
     } catch (error) {
       console.error('Ошибка при сборе всех наград:', error);
     }
