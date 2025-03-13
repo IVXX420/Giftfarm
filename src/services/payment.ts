@@ -1,8 +1,8 @@
 import { toNano } from '@ton/core';
 
 class PaymentService {
-  private static SUBSCRIPTION_PRICE = 1; // 1 TON за подписку
-  private static SUBSCRIPTION_DURATION = 30 * 24 * 60 * 60 * 1000; // 30 дней в миллисекундах
+  private static SUBSCRIPTION_PRICE = 0.1; // 0.1 TON за подписку
+  private static SUBSCRIPTION_DURATION = 7 * 24 * 60 * 60 * 1000; // 7 дней в миллисекундах
   private static OWNER_ADDRESS = 'UQAHmegvebyyP9bVXc-H1unVw9UrUZyPD15jB6PfYVM-ZcvJ'; // Адрес владельца для получения платежей
   private static apiEndpoint = 'https://api.ton.dev'; // Замените на реальный API-конечный путь
   private static apiKey = 'your-api-key'; // Замените на реальный API-ключ
