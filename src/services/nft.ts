@@ -25,13 +25,14 @@ class NFTService {
     try {
       const response = await fetch(url, {
         headers: {
-          'X-API-Key': this.apiKey,
+          'Authorization': this.apiKey,
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
-        mode: 'cors',
       });
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error('API Error:', errorText);
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
@@ -61,16 +62,16 @@ class NFTService {
       console.log('Supported collections:', SUPPORTED_COLLECTIONS);
       
       // Получаем NFT через API
-      const data = await this.makeRequest(`${this.apiEndpoint}/getWalletNfts?address=${userAddress}`);
-      const nfts = data.nfts || [];
+      const data = await this.makeRequest(`${this.apiEndpoint}/nft/searchItems?owner=${userAddress}&limit=1000&offset=0`);
+      const nfts = data.items || [];
       console.log('All NFTs:', nfts);
 
       // Фильтруем только NFT из поддерживаемых коллекций
       const supportedNFTs = nfts.filter((nft: any) => {
         const isSupported = SUPPORTED_COLLECTIONS.some(collection => 
-          collection.address === nft.collection_address
+          collection.address === nft.collection?.address
         );
-        console.log('NFT:', nft.address, 'Collection:', nft.collection_address, 'Is supported:', isSupported);
+        console.log('NFT:', nft.address, 'Collection:', nft.collection?.address, 'Is supported:', isSupported);
         return isSupported;
       });
       console.log('Supported NFTs:', supportedNFTs);
@@ -83,8 +84,13 @@ class NFTService {
           
           return {
             address: nft.address,
-            collectionAddress: nft.collection_address,
-            metadata,
+            collectionAddress: nft.collection?.address,
+            metadata: {
+              name: nft.metadata?.name || 'Unnamed NFT',
+              description: nft.metadata?.description || '',
+              image: nft.metadata?.image || '',
+              attributes: nft.metadata?.attributes || [],
+            },
             isStaking: farmingData.isStaking,
             stakingStartTime: farmingData.startTime,
             accumulatedGift: this.calculateAccumulatedGift(nft.address)
@@ -104,14 +110,14 @@ class NFTService {
   private async getNFTMetadata(nftAddress: string) {
     try {
       console.log('Getting metadata for NFT:', nftAddress);
-      const metadata = await this.makeRequest(`${this.apiEndpoint}/getNftItemMetadata?address=${nftAddress}`);
-      console.log('NFT metadata:', metadata);
+      const data = await this.makeRequest(`${this.apiEndpoint}/nft/getItem?address=${nftAddress}`);
+      console.log('NFT metadata:', data);
       
       return {
-        name: metadata.name || 'Unnamed NFT',
-        description: metadata.description || '',
-        image: metadata.image || '',
-        attributes: metadata.attributes || [],
+        name: data.metadata?.name || 'Unnamed NFT',
+        description: data.metadata?.description || '',
+        image: data.metadata?.image || '',
+        attributes: data.metadata?.attributes || [],
       };
     } catch (error) {
       console.error('Ошибка при получении метаданных NFT:', error);
