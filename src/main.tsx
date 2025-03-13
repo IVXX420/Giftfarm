@@ -4,6 +4,10 @@ import { WebAppProvider } from '@vkruglikov/react-telegram-web-app';
 import { TonConnectUIProvider } from '@tonconnect/ui-react';
 import App from './App';
 import './styles/index.css';
+import { initTonConnect } from './config/ton';
+
+// Инициализируем TON Connect
+initTonConnect().catch(console.error);
 
 const manifestUrl = 'https://giftfarm.vercel.app/tonconnect-manifest.json';
 
