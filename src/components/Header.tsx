@@ -8,7 +8,7 @@ const Header: React.FC<HeaderProps> = ({ onDisconnect }) => {
   const { wallet } = useTonConnect();
 
   return (
-    <div className="backdrop-blur-lg bg-white/5 border-b border-white/10 mb-4 sm:mb-6 w-full">
+    <div className="fixed top-0 left-0 right-0 z-50 backdrop-blur-lg bg-white/5 border-b border-white/10">
       <div className="w-full px-3 sm:px-4 py-3 sm:py-4">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-0 max-w-7xl mx-auto">
           {/* Кошелек слева */}

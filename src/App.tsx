@@ -39,13 +39,13 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0F1923] via-[#1A2634] to-[#23303F] text-white p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-[#0F1923] via-[#1A2634] to-[#23303F] text-white relative overflow-hidden">
       <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10"></div>
       <div className="absolute inset-0 bg-gradient-to-t from-[#0F1923]/50 to-transparent"></div>
       
       <div className="relative z-10">
         <Header onDisconnect={handleDisconnect} />
-        <main className="container mx-auto px-4 py-8">
+        <main className="container mx-auto px-4 pt-24 pb-8">
           <Routes>
             <Route path="/" element={
               tonConnectUI.account ? <Navigate to="/dashboard" replace /> : <Dashboard />
