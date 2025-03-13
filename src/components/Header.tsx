@@ -1,20 +1,13 @@
 import React from 'react';
-import Logo from './Logo';
-import { useTonConnectUI } from '@tonconnect/ui-react';
 
 const Header: React.FC = () => {
-  const [tonConnectUI] = useTonConnectUI();
-  const wallet = tonConnectUI.account;
-
   return (
-    <header className="glass-panel p-4 mb-6">
-      <div className="container mx-auto flex justify-between items-center">
-        <Logo />
-        {wallet && (
-          <div className="text-sm text-gray-400">
-            Кошелёк: {wallet.address.slice(0, 6)}...{wallet.address.slice(-4)}
-          </div>
-        )}
+    <header className="glass-panel p-4 sm:p-6 mb-4 sm:mb-8">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center">
+          <div className="text-3xl mr-2">🎁</div>
+          <span className="text-2xl text-blue-400 font-bold">Gift Farm</span>
+        </div>
       </div>
     </header>
   );
