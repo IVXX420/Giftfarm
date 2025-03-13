@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { NFT } from '../types/nft';
-import { nftService } from '../services/nft';
+import nftService from '../services/nft';
 
 const Card = styled.div`
   background: var(--tg-theme-secondary-bg-color, #f0f0f0);

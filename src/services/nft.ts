@@ -79,7 +79,6 @@ class NFTService {
       // Получаем метаданные для каждого NFT
       const nftsWithMetadata = await Promise.all(
         supportedNFTs.map(async (nft: any) => {
-          const metadata = await this.getNFTMetadata(nft.address);
           const farmingData = this.farmingState[nft.address] || { isStaking: false };
           
           return {
@@ -103,30 +102,6 @@ class NFTService {
     } catch (error) {
       console.error('Ошибка при получении NFT:', error);
       throw error;
-    }
-  }
-
-  // Получить метаданные NFT
-  private async getNFTMetadata(nftAddress: string) {
-    try {
-      console.log('Getting metadata for NFT:', nftAddress);
-      const data = await this.makeRequest(`${this.apiEndpoint}/nft/getItem?address=${nftAddress}`);
-      console.log('NFT metadata:', data);
-      
-      return {
-        name: data.metadata?.name || 'Unnamed NFT',
-        description: data.metadata?.description || '',
-        image: data.metadata?.image || '',
-        attributes: data.metadata?.attributes || [],
-      };
-    } catch (error) {
-      console.error('Ошибка при получении метаданных NFT:', error);
-      return {
-        name: 'Error loading NFT',
-        description: '',
-        image: '',
-        attributes: [],
-      };
     }
   }
 
@@ -164,12 +139,21 @@ class NFTService {
     if (!farmingData || !farmingData.isStaking) return 0;
 
     const now = Date.now();
-    const farmingTime = now - farmingData.startTime;
-    const hours = Math.floor(farmingTime / (60 * 60 * 1000));
-    
-    // 1 токен в час, максимум 12 токенов
-    return Math.min(hours, 12);
+    const elapsedHours = (now - farmingData.startTime) / (1000 * 60 * 60);
+    const maxHours = 12;
+    const hourlyRate = 1;
+
+    return Math.min(elapsedHours * hourlyRate, maxHours * hourlyRate);
+  }
+
+  // Обновление состояния фарминга
+  updateFarmingState(nftAddress: string, isStaking: boolean) {
+    this.farmingState[nftAddress] = {
+      isStaking,
+      startTime: isStaking ? Date.now() : 0
+    };
+    this.saveFarmingState();
   }
 }
 
-export const nftService = new NFTService(); 
+export default new NFTService(); 

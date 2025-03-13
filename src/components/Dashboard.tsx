@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useTonConnectUI } from '@tonconnect/ui-react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-import { nftService } from '../services/nft';
+import nftService from '../services/nft';
 import { NFT } from '../types/nft';
 
 const Container = styled.div`

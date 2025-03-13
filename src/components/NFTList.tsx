@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { useTonConnectUI } from '@tonconnect/ui-react';
-import { nftService } from '../services/nft';
+import nftService from '../services/nft';
 import { NFT } from '../types/nft';
 import NFTCard from './NFTCard';
 
