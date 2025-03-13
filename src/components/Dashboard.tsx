@@ -5,6 +5,10 @@ import { useTonConnectUI } from '@tonconnect/ui-react';
 import NFTService from '../services/nft';
 import SubscriptionService from '../services/subscription';
 import { NFT } from '../types/nft';
+import NFTCard from './NFTCard';
+import SubscriptionPanel from './SubscriptionPanel';
+import TopPanel from './TopPanel';
+import StatsPanel from './StatsPanel';
 import Logo from './Logo';
 
 const Dashboard: React.FC = () => {
@@ -14,6 +18,7 @@ const Dashboard: React.FC = () => {
   const [nfts, setNfts] = useState<NFT[]>([]);
   const [totalGift, setTotalGift] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [selectedTab, setSelectedTab] = useState<'all' | 'farming'>('all');
   const [isConnecting, setIsConnecting] = useState<boolean>(false);
   const [isSubscribed, setIsSubscribed] = useState<boolean>(false);
 
@@ -185,119 +190,92 @@ const Dashboard: React.FC = () => {
   return (
     <div className="min-h-screen animate-gradient py-4 sm:py-8">
       <div className="container mx-auto px-2 sm:px-4 max-w-4xl">
-        {/* Верхняя панель с логотипом, названием и кошельком */}
-        <div className="glass-panel p-4 sm:p-6 mb-4 sm:mb-8">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Logo />
-              <h1 className="text-xl sm:text-2xl font-bold gradient-text">
-                Gift Farm
-              </h1>
-            </div>
-            <div className="flex items-center gap-4">
-              <div className="glass-panel px-3 py-1.5">
-                <p className="text-xs sm:text-sm font-mono text-gray-300">
-                  {wallet?.shortAddress}
-                </p>
-              </div>
-              <button 
-                onClick={handleDisconnect}
-                className="button-base py-1.5 px-3 text-sm"
-              >
-                Выйти
-              </button>
-            </div>
-          </div>
-        </div>
+        {/* Верхняя панель */}
+        <TopPanel onDisconnect={handleDisconnect} />
 
-        {/* Информационные блоки */}
-        <div className="grid grid-cols-3 gap-4 mb-4">
-          <div className="glass-panel p-4 text-center">
-            <p className="text-sm text-gray-400 mb-2">Баланс GIFT</p>
-            <p className="text-xl font-bold gradient-text">
-              {totalGift.toFixed(3)}
-              {isSubscribed && <span className="text-xs text-gray-400 block">x1.5 бонус</span>}
-            </p>
-          </div>
-          <div className="glass-panel p-4 text-center">
-            <p className="text-sm text-gray-400 mb-2">NFT на фарме</p>
-            <p className="text-xl font-bold text-green-400">
-              {farmingNFTs.length}
-            </p>
-          </div>
-          <div className="glass-panel p-4 text-center">
-            <p className="text-sm text-gray-400 mb-2">Всего NFT</p>
-            <p className="text-xl font-bold text-blue-400">
-              {nfts.length}
-            </p>
-          </div>
-        </div>
+        {/* Информационная панель */}
+        <StatsPanel
+          totalGift={totalGift}
+          totalNFTs={nfts.length}
+          farmingNFTs={farmingNFTs.length}
+          isSubscribed={isSubscribed}
+        />
 
         {/* Панель подписки */}
-        <div className="glass-panel p-4 sm:p-6 mb-4 flex justify-between items-center">
-          <div>
-            <h2 className="text-lg font-bold mb-2">
-              {isSubscribed ? 'Премиум активен' : 'Получите премиум'}
-            </h2>
-            <p className="text-sm text-gray-400">
-              Увеличьте скорость фарма в 1.5 раза
-            </p>
-          </div>
-          <div className="flex gap-2">
-            {!isSubscribed && (
-              <button
-                onClick={handleSubscribe}
-                className="button-base py-2 px-4"
-              >
-                Купить за 0.1 TON
-              </button>
-            )}
-            <button
-              onClick={handleStartAllFarming}
-              disabled={!isSubscribed || nfts.length === 0}
-              className="button-base py-2 px-4"
-            >
-              Запустить все
-            </button>
-            <button
-              onClick={handleCollectAllRewards}
-              disabled={!isSubscribed || farmingNFTs.length === 0}
-              className="button-base py-2 px-4"
-            >
-              Собрать все
-            </button>
-          </div>
+        <SubscriptionPanel
+          isSubscribed={isSubscribed}
+          onSubscribe={handleSubscribe}
+          onStartAllFarming={handleStartAllFarming}
+          onCollectAllRewards={handleCollectAllRewards}
+          farmingCount={farmingNFTs.length}
+          totalNFTs={nfts.length}
+        />
+
+        {/* Табы */}
+        <div className="flex space-x-2 sm:space-x-4 mb-4 sm:mb-6">
+          <button 
+            className={`px-3 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-all duration-300 hover-scale text-sm sm:text-base ${
+              selectedTab === 'all' 
+                ? 'bg-blue-600 text-white shadow-glow' 
+                : 'glass-panel text-gray-400 hover:text-white'
+            }`}
+            onClick={() => setSelectedTab('all')}
+          >
+            Все NFT ({nfts.length})
+          </button>
+          <button 
+            className={`px-3 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-all duration-300 hover-scale text-sm sm:text-base ${
+              selectedTab === 'farming' 
+                ? 'bg-blue-600 text-white shadow-glow' 
+                : 'glass-panel text-gray-400 hover:text-white'
+            }`}
+            onClick={() => setSelectedTab('farming')}
+          >
+            Фармятся ({farmingNFTs.length})
+          </button>
         </div>
 
-        {/* Список NFT */}
-        {isLoading ? (
-          <div className="glass-panel p-6 text-center">
-            <div className="animate-spin h-12 w-12 mx-auto mb-4">
-              {/* Спиннер */}
+        {/* Загрузка */}
+        {isLoading && (
+          <div className="glass-panel p-6 sm:p-12 text-center animate-fadeIn">
+            <div className="inline-block animate-bounce-sm">
+              <svg className="animate-spin h-12 w-12 sm:h-16 sm:w-16 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
             </div>
-            <p>Загрузка NFT...</p>
+            <p className="text-gray-300 mt-4 sm:mt-6 text-base sm:text-lg animate-pulse">Загрузка NFT...</p>
           </div>
-        ) : nfts.length === 0 ? (
-          <div className="glass-panel p-6 text-center">
-            <p className="text-lg mb-2">У вас нет NFT для фарминга</p>
-            <p className="text-sm text-gray-400">Приобретите NFT из поддерживаемых коллекций</p>
+        )}
+
+        {/* Пустое состояние */}
+        {!isLoading && nfts.length === 0 && (
+          <div className="glass-panel p-6 sm:p-12 text-center animate-fadeIn">
+            <svg className="mx-auto h-16 w-16 sm:h-24 sm:w-24 text-gray-600 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+            </svg>
+            <p className="text-gray-300 mt-4 sm:mt-6 text-lg sm:text-xl">
+              У вас нет NFT, подходящих для фарминга
+            </p>
+            <p className="text-gray-500 mt-2 text-sm sm:text-base">
+              Приобретите NFT из поддерживаемых коллекций
+            </p>
           </div>
-        ) : (
-          <div className="grid grid-cols-2 gap-4">
-            {nfts.map((nft) => (
-              <div key={nft.address} className="glass-panel p-4">
-                <div className="aspect-square mb-4 bg-gray-800 rounded-lg">
-                  {/* Здесь будет изображение NFT */}
-                </div>
-                <button
-                  onClick={() => updateNFTState(nft.address, !nft.isStaking)}
-                  className="button-base w-full py-2 mb-2"
-                >
-                  {nft.isStaking ? 'Собрать' : 'Начать фарм'}
-                </button>
-                <p className="text-sm text-gray-400 text-center">
-                  {nft.isStaking ? 'Фарминг активен' : 'Ожидает фарминга'}
-                </p>
+        )}
+
+        {/* Список NFT */}
+        {!isLoading && nfts.length > 0 && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
+            {(selectedTab === 'all' ? nfts : farmingNFTs).map((nft, index) => (
+              <div key={nft.address} 
+                className="animate-fadeIn" 
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
+                <NFTCard 
+                  nft={nft} 
+                  onBalanceUpdate={updateTotalGift}
+                  onStateUpdate={updateNFTState}
+                />
               </div>
             ))}
           </div>
