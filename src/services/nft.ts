@@ -58,11 +58,13 @@ class NFTService {
   // Получить все NFT пользователя
   async getUserNFTs(userAddress: string): Promise<NFT[]> {
     try {
-      console.log('Getting NFTs for address:', userAddress);
+      // Убираем префикс "0:" из адреса
+      const formattedAddress = userAddress.replace('0:', '');
+      console.log('Getting NFTs for address:', formattedAddress);
       console.log('Supported collections:', SUPPORTED_COLLECTIONS);
       
       // Получаем NFT через API
-      const data = await this.makeRequest(`${this.apiEndpoint}/accounts/${userAddress}/nfts`);
+      const data = await this.makeRequest(`${this.apiEndpoint}/accounts/${formattedAddress}/nfts`);
       const nfts = data.nfts || [];
       console.log('All NFTs:', nfts);
 
