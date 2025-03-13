@@ -10,12 +10,12 @@ interface FarmingState {
 }
 
 class NFTService {
-  private farmingState: FarmingState = {};
+  private farmingState: { [key: string]: { isStaking: boolean; startTime: number } } = {};
   private apiEndpoint: string;
   private apiKey: string;
 
   constructor() {
-    this.apiEndpoint = import.meta.env.VITE_TON_ENDPOINT.replace(/\/$/, '');
+    this.apiEndpoint = import.meta.env.VITE_TON_ENDPOINT;
     this.apiKey = import.meta.env.VITE_TON_API_KEY;
     this.loadFarmingState();
   }
@@ -58,51 +58,20 @@ class NFTService {
   // Получить все NFT пользователя
   async getUserNFTs(userAddress: string): Promise<NFT[]> {
     try {
-      // Убираем префикс "0:" из адреса и форматируем его
-      const formattedAddress = userAddress.replace('0:', '').toLowerCase();
-      console.log('Getting NFTs for address:', formattedAddress);
-      console.log('Supported collections:', SUPPORTED_COLLECTIONS);
+      console.log('Получаем NFT для адреса:', userAddress);
       
-      // Получаем NFT через API
-      const data = await this.makeRequest(`${this.apiEndpoint}/accounts/${formattedAddress}/nfts?limit=1000&offset=0&indirect_ownership=false`);
-      const nfts = data.nfts || [];
-      console.log('All NFTs:', nfts);
+      // Получаем список всех NFT на кошельке
+      const allNFTs = await this.fetchAccountNFTs(userAddress);
+      console.log('Все NFT на кошельке:', allNFTs);
 
-      // Фильтруем только NFT из поддерживаемых коллекций и логируем каждый NFT
-      const supportedNFTs = nfts.filter((nft: any) => {
-        console.log('Checking NFT:', nft);
-        const nftCollectionAddress = nft.collection?.address?.toLowerCase();
-        const isSupported = SUPPORTED_COLLECTIONS.some(collection => 
-          collection.address.toLowerCase() === nftCollectionAddress
-        );
-        console.log('NFT:', nft.address, 'Collection:', nftCollectionAddress, 'Is supported:', isSupported);
-        return isSupported;
-      });
-      console.log('Supported NFTs:', supportedNFTs);
+      // Фильтруем NFT из поддерживаемых коллекций
+      const supportedNFTs = this.filterSupportedNFTs(allNFTs);
+      console.log('Поддерживаемые NFT:', supportedNFTs);
 
       // Получаем метаданные для каждого NFT
-      const nftsWithMetadata = await Promise.all(
-        supportedNFTs.map(async (nft: any) => {
-          const farmingData = this.farmingState[nft.address] || { isStaking: false };
-          console.log('Processing NFT metadata:', nft);
-          
-          return {
-            address: nft.address,
-            collectionAddress: nft.collection?.address,
-            metadata: {
-              name: nft.metadata?.name || nft.dns || 'Unnamed NFT',
-              description: nft.metadata?.description || '',
-              image: nft.metadata?.image || nft.previews?.[0]?.url || '',
-              attributes: nft.metadata?.attributes || [],
-            },
-            isStaking: farmingData.isStaking,
-            stakingStartTime: farmingData.startTime,
-            accumulatedGift: this.calculateAccumulatedGift(nft.address)
-          };
-        })
-      );
+      const nftsWithMetadata = await this.enrichNFTsWithMetadata(supportedNFTs);
+      console.log('NFT с метаданными:', nftsWithMetadata);
 
-      console.log('NFTs with metadata:', nftsWithMetadata);
       return nftsWithMetadata;
     } catch (error) {
       console.error('Ошибка при получении NFT:', error);
@@ -110,11 +79,68 @@ class NFTService {
     }
   }
 
+  // Получить список всех NFT на кошельке
+  private async fetchAccountNFTs(address: string): Promise<any[]> {
+    try {
+      const response = await fetch(`${this.apiEndpoint}/v2/accounts/${address}/nfts?limit=1000`, {
+        headers: {
+          'Authorization': `Bearer ${this.apiKey}`,
+          'Accept': 'application/json',
+        }
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('API Error:', errorText);
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.nfts || [];
+    } catch (error) {
+      console.error('Ошибка при получении списка NFT:', error);
+      throw error;
+    }
+  }
+
+  // Фильтруем NFT из поддерживаемых коллекций
+  private filterSupportedNFTs(nfts: any[]): any[] {
+    return nfts.filter(nft => {
+      const collectionAddress = nft.collection?.address;
+      const isSupported = SUPPORTED_COLLECTIONS.some(
+        collection => collection.address.toLowerCase() === collectionAddress?.toLowerCase()
+      );
+      console.log(`NFT ${nft.address} из коллекции ${collectionAddress} поддерживается: ${isSupported}`);
+      return isSupported;
+    });
+  }
+
+  // Обогащаем NFT метаданными
+  private async enrichNFTsWithMetadata(nfts: any[]): Promise<NFT[]> {
+    return Promise.all(nfts.map(async (nft) => {
+      const farmingData = this.farmingState[nft.address] || { isStaking: false, startTime: 0 };
+      
+      return {
+        address: nft.address,
+        collectionAddress: nft.collection?.address,
+        metadata: {
+          name: nft.metadata?.name || nft.dns || 'Unnamed NFT',
+          description: nft.metadata?.description || '',
+          image: nft.metadata?.image || nft.previews?.[0]?.url || '',
+          attributes: nft.metadata?.attributes || [],
+        },
+        isStaking: farmingData.isStaking,
+        stakingStartTime: farmingData.startTime,
+        accumulatedGift: this.calculateAccumulatedGift(nft.address)
+      };
+    }));
+  }
+
   // Начать фарминг для NFT
   async startFarming(nftAddress: string): Promise<void> {
     this.farmingState[nftAddress] = {
       isStaking: true,
-      startTime: Date.now(),
+      startTime: Date.now()
     };
     this.saveFarmingState();
   }
@@ -125,8 +151,6 @@ class NFTService {
     if (!farmingData || !farmingData.isStaking) return 0;
 
     const reward = this.calculateAccumulatedGift(nftAddress);
-    
-    // Сбрасываем фарминг
     delete this.farmingState[nftAddress];
     this.saveFarmingState();
 
