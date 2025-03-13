@@ -72,7 +72,7 @@ const NFTCard: React.FC<NFTCardProps> = ({ nft, onBalanceUpdate }) => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-4 m-2 w-64">
+    <div className="bg-white rounded-lg shadow-md p-4">
       <div className="relative pb-[100%] mb-4">
         <img 
           src={nft.metadata.image} 
@@ -81,24 +81,24 @@ const NFTCard: React.FC<NFTCardProps> = ({ nft, onBalanceUpdate }) => {
         />
       </div>
       
-      <h3 className="text-lg font-bold mb-2 truncate">{nft.metadata.name}</h3>
+      <h3 className="text-lg font-bold mb-3 truncate">{nft.metadata.name}</h3>
       
       {!isStaking && timeLeft === 0 && (
         <button
           onClick={handleStartFarming}
           disabled={isLoading}
-          className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+          className="w-full bg-blue-500 text-white py-3 px-4 rounded-md hover:bg-blue-600 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed text-lg font-medium"
         >
           {isLoading ? 'Запуск...' : 'Начать фарм'}
         </button>
       )}
 
       {isStaking && timeLeft > 0 && (
-        <div className="text-center">
+        <div className="text-center py-2">
           <p className="text-gray-600 mb-2">До окончания фарма:</p>
-          <p className="text-xl font-bold mb-2">{formatTime(timeLeft)}</p>
-          <p className="text-sm text-gray-500">
-            Накоплено GIFT: {accumulatedGift.toFixed(3)}
+          <p className="text-2xl font-bold mb-3">{formatTime(timeLeft)}</p>
+          <p className="text-lg text-gray-700">
+            Накоплено GIFT: <span className="font-bold">{accumulatedGift.toFixed(3)}</span>
           </p>
         </div>
       )}
@@ -107,7 +107,7 @@ const NFTCard: React.FC<NFTCardProps> = ({ nft, onBalanceUpdate }) => {
         <button
           onClick={handleCollectReward}
           disabled={isLoading}
-          className="w-full bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+          className="w-full bg-green-500 text-white py-3 px-4 rounded-md hover:bg-green-600 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed text-lg font-medium"
         >
           {isLoading ? 'Сбор...' : `Собрать ${accumulatedGift.toFixed(3)} GIFT`}
         </button>
