@@ -46,6 +46,17 @@ const Dashboard: React.FC = () => {
     }
   };
 
+  // Обновление состояния NFT
+  const updateNFTState = (nftAddress: string, isStaking: boolean) => {
+    setNfts(prevNfts => 
+      prevNfts.map(nft => 
+        nft.address === nftAddress 
+          ? { ...nft, isStaking, stakingStartTime: isStaking ? Date.now() : 0 }
+          : nft
+      )
+    );
+  };
+
   useEffect(() => {
     if (connected && wallet?.address) {
       console.log('Кошелек подключен:', wallet.address);
@@ -233,6 +244,7 @@ const Dashboard: React.FC = () => {
                 <NFTCard 
                   nft={nft} 
                   onBalanceUpdate={updateTotalGift}
+                  onStateUpdate={updateNFTState}
                 />
               </div>
             ))}

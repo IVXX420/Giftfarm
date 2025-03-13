@@ -5,9 +5,10 @@ import NFTService from '../services/nft';
 interface NFTCardProps {
   nft: NFT;
   onBalanceUpdate: () => void;
+  onStateUpdate: (nftAddress: string, isStaking: boolean) => void;
 }
 
-const NFTCard: React.FC<NFTCardProps> = ({ nft, onBalanceUpdate }) => {
+const NFTCard: React.FC<NFTCardProps> = ({ nft, onBalanceUpdate, onStateUpdate }) => {
   const [timeLeft, setTimeLeft] = useState<number>(0);
   const [isStaking, setIsStaking] = useState<boolean>(nft.isStaking);
   const [accumulatedGift, setAccumulatedGift] = useState<number>(0);
@@ -29,6 +30,7 @@ const NFTCard: React.FC<NFTCardProps> = ({ nft, onBalanceUpdate }) => {
 
         if (remaining <= 0) {
           setIsStaking(false);
+          onStateUpdate(nft.address, false);
         }
       }
     };
@@ -36,7 +38,7 @@ const NFTCard: React.FC<NFTCardProps> = ({ nft, onBalanceUpdate }) => {
     updateTimer();
     const timer = setInterval(updateTimer, 1000);
     return () => clearInterval(timer);
-  }, [isStaking, nft.stakingStartTime, nft.address]);
+  }, [isStaking, nft.stakingStartTime, nft.address, onStateUpdate]);
 
   const formatTime = (ms: number): string => {
     const hours = Math.floor(ms / (1000 * 60 * 60));
@@ -50,6 +52,7 @@ const NFTCard: React.FC<NFTCardProps> = ({ nft, onBalanceUpdate }) => {
       setIsLoading(true);
       await NFTService.startFarming(nft.address);
       setIsStaking(true);
+      onStateUpdate(nft.address, true);
       onBalanceUpdate();
     } catch (error) {
       console.error('Ошибка при старте фарминга:', error);
@@ -63,6 +66,7 @@ const NFTCard: React.FC<NFTCardProps> = ({ nft, onBalanceUpdate }) => {
       setIsLoading(true);
       await NFTService.collectReward(nft.address);
       setIsStaking(false);
+      onStateUpdate(nft.address, false);
       setAccumulatedGift(0);
       onBalanceUpdate();
     } catch (error) {
