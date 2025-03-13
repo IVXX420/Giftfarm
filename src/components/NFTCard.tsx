@@ -1,61 +1,68 @@
 import React, { useState, useEffect } from 'react';
-import { NFT } from '../types/nft';
-import NFTService from '../services/nft';
+import { toast } from 'react-toastify';
 
 interface NFTCardProps {
-  nft: NFT;
-  onBalanceUpdate: () => void;
-  onStateUpdate: (nftAddress: string, isStaking: boolean) => void;
+  id: string;
+  name: string;
+  image: string;
+  collection: string;
+  isFarming: boolean;
+  farmingEndTime?: number;
+  onStartFarming: () => Promise<void>;
+  onCollectReward: () => Promise<void>;
 }
 
-const NFTCard: React.FC<NFTCardProps> = ({ nft, onBalanceUpdate, onStateUpdate }) => {
-  const [timeLeft, setTimeLeft] = useState<number>(0);
-  const [isStaking, setIsStaking] = useState<boolean>(nft.isStaking);
-  const [accumulatedGift, setAccumulatedGift] = useState<number>(0);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isHovered, setIsHovered] = useState<boolean>(false);
+const NFTCard: React.FC<NFTCardProps> = ({
+  id,
+  name,
+  image,
+  collection,
+  isFarming,
+  farmingEndTime,
+  onStartFarming,
+  onCollectReward,
+}) => {
+  const [timeLeft, setTimeLeft] = useState<string>('');
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const updateTimer = () => {
-      if (isStaking) {
+    if (isFarming && farmingEndTime) {
+      const timer = setInterval(() => {
         const now = Date.now();
-        const endTime = nft.stakingStartTime + (12 * 60 * 60 * 1000); // 12 часов в миллисекундах
-        const remaining = Math.max(0, endTime - now);
-        setTimeLeft(remaining);
+        const difference = farmingEndTime - now;
 
-        // Обновляем накопленные GIFT
-        NFTService.getAccumulatedGift(nft.address).then(amount => {
-          setAccumulatedGift(amount);
-        });
-
-        if (remaining <= 0) {
-          setIsStaking(false);
-          onStateUpdate(nft.address, false);
+        if (difference <= 0) {
+          setTimeLeft('Готово!');
+          clearInterval(timer);
+          return;
         }
-      }
-    };
 
-    updateTimer();
-    const timer = setInterval(updateTimer, 1000);
-    return () => clearInterval(timer);
-  }, [isStaking, nft.stakingStartTime, nft.address, onStateUpdate]);
+        const hours = Math.floor(difference / (1000 * 60 * 60));
+        const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((difference % (1000 * 60)) / 1000);
 
-  const formatTime = (ms: number): string => {
-    const hours = Math.floor(ms / (1000 * 60 * 60));
-    const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((ms % (1000 * 60)) / 1000);
-    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-  };
+        setTimeLeft(`${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`);
+      }, 1000);
+
+      return () => clearInterval(timer);
+    }
+  }, [isFarming, farmingEndTime]);
 
   const handleStartFarming = async () => {
     try {
       setIsLoading(true);
-      await NFTService.startFarming(nft.address);
-      setIsStaking(true);
-      onStateUpdate(nft.address, true);
-      onBalanceUpdate();
+      await onStartFarming();
+      toast.success('Фарминг успешно запущен! 🚀', {
+        className: 'toast-base animate-fade-in-up',
+        position: 'top-right',
+        autoClose: 3000
+      });
     } catch (error) {
-      console.error('Ошибка при старте фарминга:', error);
+      toast.error('Ошибка при запуске фарминга 😢', {
+        className: 'toast-base animate-fade-in-up',
+        position: 'top-right',
+        autoClose: 3000
+      });
     } finally {
       setIsLoading(false);
     }
@@ -64,124 +71,94 @@ const NFTCard: React.FC<NFTCardProps> = ({ nft, onBalanceUpdate, onStateUpdate }
   const handleCollectReward = async () => {
     try {
       setIsLoading(true);
-      await NFTService.collectReward(nft.address);
-      setIsStaking(false);
-      onStateUpdate(nft.address, false);
-      setAccumulatedGift(0);
-      onBalanceUpdate();
+      await onCollectReward();
+      toast.success('Награда успешно собрана! 🎁', {
+        className: 'toast-base animate-fade-in-up',
+        position: 'top-right',
+        autoClose: 3000
+      });
     } catch (error) {
-      console.error('Ошибка при сборе наград:', error);
+      toast.error('Ошибка при сборе награды 😢', {
+        className: 'toast-base animate-fade-in-up',
+        position: 'top-right',
+        autoClose: 3000
+      });
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div 
-      className="glass-panel hover-scale"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      <div className="relative pb-[100%] overflow-hidden rounded-xl border border-white/10 group">
-        <img 
-          src={nft.metadata.image} 
-          alt={nft.metadata.name} 
-          className={`absolute top-0 left-0 w-full h-full object-cover transition-all duration-500 ${
-            isHovered ? 'scale-110 brightness-110' : 'scale-100 brightness-90'
-          }`}
-        />
-        {isStaking && timeLeft > 0 && (
-          <div className="absolute top-3 right-3 glass-panel px-3 py-1 rounded-full text-sm font-medium animate-pulse">
-            Фарминг
-          </div>
-        )}
-        <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/80 to-transparent">
-          <h3 className="text-base font-bold truncate text-white group-hover:text-blue-400 transition-colors duration-300">
-            {nft.metadata.name}
-          </h3>
-        </div>
-      </div>
+    <div className="card-hover glass-panel p-4 rounded-xl overflow-hidden relative group">
+      {/* Фоновое изображение с градиентом */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center opacity-20 group-hover:opacity-30 transition-opacity duration-300"
+        style={{ backgroundImage: `url(${image})` }}
+      />
       
-      {!isStaking && timeLeft === 0 && (
-        <div className="p-4">
-          <button
-            onClick={handleStartFarming}
-            disabled={isLoading}
-            className="button-base py-3 px-4 text-sm font-medium w-full hover:shadow-glow"
-          >
-            {isLoading ? (
-              <span className="flex items-center justify-center">
-                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                <span className="animate-pulse">Запуск...</span>
-              </span>
-            ) : (
-              <span className="flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-                Начать фарм
-              </span>
-            )}
-          </button>
-        </div>
-      )}
+      {/* Градиентный оверлей */}
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-gray-900/50 to-gray-900/80" />
 
-      {isStaking && timeLeft > 0 && (
-        <div className="p-4 space-y-3">
-          <div className="glass-panel p-3">
-            <div className="flex justify-between items-center mb-2">
-              <p className="text-gray-400 text-sm">До окончания:</p>
-              <p className="text-lg font-bold gradient-text animate-pulse">
-                {formatTime(timeLeft)}
-              </p>
-            </div>
-            <div className="w-full bg-gray-700/50 rounded-full h-1.5">
+      {/* Контент */}
+      <div className="relative z-10">
+        {/* Заголовок */}
+        <h3 className="text-xl font-bold mb-2 text-white animate-fade-in-up">
+          {name}
+        </h3>
+
+        {/* Коллекция */}
+        <p className="text-gray-400 text-sm mb-4 animate-fade-in-up delay-100">
+          {collection}
+        </p>
+
+        {/* Изображение NFT */}
+        <div className="relative mb-4 rounded-lg overflow-hidden group-hover:scale-105 transition-transform duration-300">
+          <img 
+            src={image} 
+            alt={name}
+            className="w-full h-48 object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-gray-900/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        </div>
+
+        {/* Прогресс-бар фарминга */}
+        {isFarming && farmingEndTime && (
+          <div className="mb-4">
+            <div className="progress-bar">
               <div 
-                className="bg-gradient-to-r from-blue-400 to-blue-600 h-1.5 rounded-full transition-all duration-300"
-                style={{ width: `${(1 - timeLeft / (12 * 60 * 60 * 1000)) * 100}%` }}
+                className="progress-bar-fill animate-pulse"
+                style={{ 
+                  width: `${((Date.now() - (farmingEndTime - 12 * 60 * 60 * 1000)) / (12 * 60 * 60 * 1000)) * 100}%`
+                }}
               />
             </div>
+            <p className="text-center text-sm text-gray-400 mt-2 animate-pulse">
+              Осталось: {timeLeft}
+            </p>
           </div>
-          <div className="glass-panel p-3">
-            <div className="flex justify-between items-center">
-              <p className="text-gray-400 text-sm">Накоплено:</p>
-              <p className="text-lg font-bold gradient-text">
-                {accumulatedGift.toFixed(3)} GIFT
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
+        )}
 
-      {isStaking && timeLeft === 0 && (
-        <div className="p-4">
-          <button
-            onClick={handleCollectReward}
-            disabled={isLoading}
-            className="button-base py-3 px-4 text-sm font-medium w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 hover:shadow-[0_0_15px_rgba(34,197,94,0.5)]"
-          >
-            {isLoading ? (
-              <span className="flex items-center justify-center">
-                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                <span className="animate-pulse">Сбор...</span>
-              </span>
-            ) : (
-              <span className="flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                Собрать {accumulatedGift.toFixed(3)} GIFT
-              </span>
-            )}
-          </button>
+        {/* Кнопки действий */}
+        <div className="flex gap-2">
+          {!isFarming ? (
+            <button
+              onClick={handleStartFarming}
+              disabled={isLoading}
+              className="button-base ripple-effect flex-1 py-2 text-sm font-medium"
+            >
+              {isLoading ? 'Запуск...' : 'Начать фарм'}
+            </button>
+          ) : (
+            <button
+              onClick={handleCollectReward}
+              disabled={isLoading || timeLeft !== 'Готово!'}
+              className="button-base ripple-effect flex-1 py-2 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isLoading ? 'Сбор...' : 'Собрать награду'}
+            </button>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 };

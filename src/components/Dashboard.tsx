@@ -9,6 +9,8 @@ import NFTCard from './NFTCard';
 import SubscriptionPanel from './SubscriptionPanel';
 import StatsPanel from './StatsPanel';
 import Logo from './Logo';
+import Header from './Header';
+import { toast } from 'react-toastify';
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -16,7 +18,7 @@ const Dashboard: React.FC = () => {
   const [tonConnectUI] = useTonConnectUI();
   const [nfts, setNfts] = useState<NFT[]>([]);
   const [totalGift, setTotalGift] = useState<number>(0);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [selectedTab, setSelectedTab] = useState<'all' | 'farming'>('all');
   const [isConnecting, setIsConnecting] = useState<boolean>(false);
   const [isSubscribed, setIsSubscribed] = useState<boolean>(false);
@@ -33,6 +35,11 @@ const Dashboard: React.FC = () => {
       setNfts(userNFTs);
     } catch (error) {
       console.error('Ошибка при загрузке NFT:', error);
+      toast.error('Ошибка при загрузке NFT 😢', {
+        className: 'toast-base animate-fade-in-up',
+        position: 'top-right',
+        autoClose: 3000
+      });
     } finally {
       setIsLoading(false);
     }
@@ -150,6 +157,23 @@ const Dashboard: React.FC = () => {
     }
   };
 
+  const handleDisconnect = async () => {
+    try {
+      await tonConnectUI.disconnect();
+      toast.success('Кошелек успешно отключен 👋', {
+        className: 'toast-base animate-fade-in-up',
+        position: 'top-right',
+        autoClose: 3000
+      });
+    } catch (error) {
+      toast.error('Ошибка при отключении кошелька 😢', {
+        className: 'toast-base animate-fade-in-up',
+        position: 'top-right',
+        autoClose: 3000
+      });
+    }
+  };
+
   if (!connected) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 animate-gradient">
@@ -180,6 +204,8 @@ const Dashboard: React.FC = () => {
   return (
     <div className="min-h-screen animate-gradient py-4 sm:py-8">
       <div className="container mx-auto px-2 sm:px-4 max-w-4xl">
+        <Header onDisconnect={handleDisconnect} />
+
         {/* Информационная панель */}
         <StatsPanel
           totalGift={totalGift}
@@ -259,9 +285,22 @@ const Dashboard: React.FC = () => {
                 style={{ animationDelay: `${index * 100}ms` }}
               >
                 <NFTCard 
-                  nft={nft} 
-                  onBalanceUpdate={updateTotalGift}
-                  onStateUpdate={updateNFTState}
+                  id={nft.id}
+                  name={nft.metadata.name}
+                  image={nft.metadata.image}
+                  collection={nft.metadata.attributes.find(attr => attr.trait_type === 'Collection')?.value || 'Unknown Collection'}
+                  isFarming={nft.isStaking}
+                  farmingEndTime={nft.stakingStartTime ? nft.stakingStartTime + 12 * 60 * 60 * 1000 : undefined}
+                  onStartFarming={async () => {
+                    await NFTService.startFarming(nft.address);
+                    updateNFTState(nft.address, true);
+                    updateTotalGift();
+                  }}
+                  onCollectReward={async () => {
+                    await NFTService.collectReward(nft.address);
+                    updateNFTState(nft.address, false);
+                    updateTotalGift();
+                  }}
                 />
               </div>
             ))}

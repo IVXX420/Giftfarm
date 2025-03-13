@@ -1,39 +1,57 @@
-import React from 'react';
 import { useTonConnect } from '../hooks/useTonConnect';
-import Logo from './Logo';
 
 interface HeaderProps {
-  onDisconnect: () => void;
+  onDisconnect: () => Promise<void>;
 }
 
 const Header: React.FC<HeaderProps> = ({ onDisconnect }) => {
   const { wallet } = useTonConnect();
 
   return (
-    <div className="glass-panel p-4 sm:p-6 mb-4 sm:mb-8">
-      <div className="flex items-center justify-between">
+    <div className="glass-panel mb-4 sm:mb-8 animate-fade-in-up">
+      <div className="flex justify-between items-center">
         {/* Кошелек слева */}
         <div className="flex items-center space-x-4">
-          <div className="text-left">
-            <p className="text-xs sm:text-sm text-gray-400 mb-1">Ваш адрес</p>
-            <div className="glass-panel px-3 py-1.5">
-              <p className="text-xs sm:text-sm font-mono text-gray-300">
-                {wallet?.shortAddress}
-              </p>
+          <div className="flex items-center space-x-2">
+            <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
+            <div className="text-sm text-gray-300">
+              {wallet ? (
+                <span className="flex items-center space-x-2">
+                  <span className="font-medium text-white">{wallet.shortAddress}</span>
+                  <span className="text-xs text-gray-400">(TON)</span>
+                </span>
+              ) : (
+                <span className="text-gray-400">Кошелек не подключен</span>
+              )}
             </div>
           </div>
-          <button 
-            onClick={onDisconnect}
-            className="button-base py-1.5 sm:py-2 px-3 sm:px-4 text-sm sm:text-base"
-          >
-            Выйти
-          </button>
+          {wallet && (
+            <button
+              onClick={onDisconnect}
+              className="text-sm text-red-400 hover:text-red-300 transition-colors duration-300 flex items-center space-x-1"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              <span>Выйти</span>
+            </button>
+          )}
         </div>
 
         {/* Логотип и название справа */}
-        <div className="flex items-center">
-          <div className="text-3xl mr-2">🎁</div>
-          <span className="text-2xl text-blue-400 font-bold">Gift Farm</span>
+        <div className="flex items-center space-x-3">
+          <div className="relative">
+            <span className="text-3xl animate-float">🎁</span>
+            <div className="absolute inset-0 animate-glow-pulse rounded-full"></div>
+          </div>
+          <div className="flex flex-col">
+            <span className="text-xl font-bold gradient-text animate-neon-pulse">
+              Gift Farm
+            </span>
+            <span className="text-xs text-gray-400">
+              Фарминг NFT в TON
+            </span>
+          </div>
         </div>
       </div>
     </div>

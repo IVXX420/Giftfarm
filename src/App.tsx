@@ -1,42 +1,39 @@
-import React, { useEffect } from 'react';
-import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
-import { useTonConnectUI } from '@tonconnect/ui-react';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { TonConnectUIProvider } from '@tonconnect/ui-react';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import Dashboard from './components/Dashboard';
-import Header from './components/Header';
+import './styles/animations.css';
+
+const manifestUrl = 'https://votipapa.vercel.app/tonconnect-manifest.json';
 
 const App: React.FC = () => {
-  const [tonConnectUI] = useTonConnectUI();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (tonConnectUI.account) {
-      navigate('/dashboard');
-    }
-  }, [tonConnectUI.account, navigate]);
-
-  const handleDisconnect = async () => {
-    try {
-      await tonConnectUI.disconnect();
-      navigate('/');
-    } catch (error) {
-      console.error('Ошибка отключения:', error);
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0F1923] to-[#23303F] text-white p-4">
-      <Header onDisconnect={handleDisconnect} />
-      <main className="container mx-auto">
-        <Routes>
-          <Route path="/" element={
-            tonConnectUI.account ? <Navigate to="/dashboard" replace /> : <Dashboard />
-          } />
-          <Route path="/dashboard" element={
-            tonConnectUI.account ? <Dashboard /> : <Navigate to="/" replace />
-          } />
-        </Routes>
-      </main>
-    </div>
+    <TonConnectUIProvider manifestUrl={manifestUrl}>
+      <Router>
+        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900">
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+          </Routes>
+          
+          {/* Глобальные уведомления */}
+          <ToastContainer
+            position="top-right"
+            autoClose={3000}
+            hideProgressBar={false}
+            newestOnTop
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="dark"
+            className="toast-container"
+          />
+        </div>
+      </Router>
+    </TonConnectUIProvider>
   );
 };
 
