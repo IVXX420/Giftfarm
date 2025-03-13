@@ -29,13 +29,44 @@ const WalletInfo = styled.div`
   border-radius: var(--border-radius);
 `;
 
+const ErrorMessage = styled.div`
+  color: #ff4444;
+  text-align: center;
+  margin: 10px 0;
+  padding: 10px;
+  background-color: rgba(255, 68, 68, 0.1);
+  border-radius: var(--border-radius);
+`;
+
 const WalletConnect: React.FC = () => {
   const [tonConnectUI] = useTonConnectUI();
+  const [error, setError] = React.useState<string | null>(null);
+
+  const handleConnect = async () => {
+    try {
+      setError(null);
+      await tonConnectUI.connectWallet();
+    } catch (err) {
+      console.error('Ошибка подключения кошелька:', err);
+      setError('Не удалось подключить кошелек. Пожалуйста, попробуйте еще раз.');
+    }
+  };
+
+  const handleDisconnect = async () => {
+    try {
+      setError(null);
+      await tonConnectUI.disconnect();
+    } catch (err) {
+      console.error('Ошибка отключения кошелька:', err);
+      setError('Не удалось отключить кошелек. Пожалуйста, попробуйте еще раз.');
+    }
+  };
 
   return (
     <div>
+      {error && <ErrorMessage>{error}</ErrorMessage>}
       {!tonConnectUI.connected ? (
-        <ConnectButton onClick={() => tonConnectUI.connectWallet()}>
+        <ConnectButton onClick={handleConnect}>
           Подключить TON Keeper
         </ConnectButton>
       ) : (
@@ -43,7 +74,7 @@ const WalletConnect: React.FC = () => {
           <WalletInfo>
             Кошелек подключен: {tonConnectUI.account?.address.slice(0, 6)}...{tonConnectUI.account?.address.slice(-4)}
           </WalletInfo>
-          <ConnectButton onClick={() => tonConnectUI.disconnect()}>
+          <ConnectButton onClick={handleDisconnect}>
             Отключить кошелек
           </ConnectButton>
         </>

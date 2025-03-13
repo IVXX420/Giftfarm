@@ -5,7 +5,7 @@ import { TonConnectUIProvider } from '@tonconnect/ui-react';
 import App from './App';
 import './styles/index.css';
 
-const manifestUrl = '/tonconnect-manifest.json';
+const manifestUrl = 'https://giftfarm.vercel.app/tonconnect-manifest.json';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
