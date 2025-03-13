@@ -64,7 +64,7 @@ class NFTService {
   // Получить список всех NFT на кошельке
   private async fetchAccountNFTs(address: string): Promise<any[]> {
     try {
-      const response = await fetch(`${this.apiEndpoint}/v2/accounts/${address}/nfts?limit=1000`, {
+      const response = await fetch(`${this.apiEndpoint}/accounts/${address}/nfts?limit=1000`, {
         headers: {
           'Authorization': `Bearer ${this.apiKey}`,
           'Accept': 'application/json',
