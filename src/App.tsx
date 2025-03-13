@@ -14,9 +14,18 @@ const App: React.FC = () => {
     }
   }, [tonConnectUI.account, navigate]);
 
+  const handleDisconnect = async () => {
+    try {
+      await tonConnectUI.disconnect();
+      navigate('/');
+    } catch (error) {
+      console.error('Ошибка отключения:', error);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0F1923] to-[#23303F] text-white p-4">
-      <Header />
+      <Header onDisconnect={handleDisconnect} />
       <main className="container mx-auto">
         <Routes>
           <Route path="/" element={
