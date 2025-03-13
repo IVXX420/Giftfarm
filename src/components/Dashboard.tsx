@@ -9,11 +9,13 @@ import NFTCard from './NFTCard';
 import SubscriptionPanel from './SubscriptionPanel';
 import StatsPanel from './StatsPanel';
 import Logo from './Logo';
+import { useBackground } from '../context/BackgroundContext';
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const { connected, wallet } = useTonConnect();
   const [tonConnectUI] = useTonConnectUI();
+  const { setBackgroundImage } = useBackground();
   const [nfts, setNfts] = useState<NFT[]>([]);
   const [totalGift, setTotalGift] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -31,6 +33,19 @@ const Dashboard: React.FC = () => {
       const userNFTs = await NFTService.getUserNFTs(wallet.address);
       console.log('Загруженные NFT:', userNFTs);
       setNfts(userNFTs);
+
+      // Устанавливаем фон на основе первого NFT
+      if (userNFTs.length > 0) {
+        const firstNFT = userNFTs[0];
+        const background = firstNFT.metadata.background;
+        if (background) {
+          setBackgroundImage({
+            color: background.color || '#1e3a8a',
+            pattern: background.pattern,
+            image: background.image
+          }, firstNFT.address);
+        }
+      }
     } catch (error) {
       console.error('Ошибка при загрузке NFT:', error);
     } finally {
@@ -254,19 +269,29 @@ const Dashboard: React.FC = () => {
           </div>
         )}
 
-        {/* Сетка NFT */}
-        {!isLoading && nfts.length > 0 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
-            {(selectedTab === 'all' ? nfts : farmingNFTs).map((nft) => (
+        {/* Список NFT */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          {nfts
+            .filter(nft => selectedTab === 'all' || nft.isStaking)
+            .map(nft => (
               <NFTCard
                 key={nft.address}
                 nft={nft}
-                onStartFarming={() => updateNFTState(nft.address, true)}
-                onCollectRewards={() => updateNFTState(nft.address, false)}
+                onStakeChange={updateNFTState}
+                onRewardCollect={updateTotalGift}
               />
             ))}
-          </div>
-        )}
+        </div>
+
+        {/* Кнопка таблицы лидеров */}
+        <div className="fixed bottom-6 left-0 right-0 flex justify-center">
+          <button
+            onClick={() => navigate('/leaderboard')}
+            className="bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 px-6 rounded-xl font-medium shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 transition-all duration-300 transform hover:scale-105"
+          >
+            Таблица лидеров
+          </button>
+        </div>
       </div>
     </div>
   );

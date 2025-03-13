@@ -6,9 +6,11 @@ import 'react-toastify/dist/ReactToastify.css';
 import Dashboard from './components/Dashboard';
 import Header from './components/Header';
 import LoadingScreen from './components/LoadingScreen';
+import Leaderboard from './components/Leaderboard';
 import { BackgroundProvider, useBackground } from './context/BackgroundContext';
 import { TonConnectUIProvider } from '@tonconnect/ui-react';
 import { manifestUrl } from './config/ton';
+import LeaderboardService from './services/leaderboard';
 
 interface AppContentProps {
   onError?: (error: Error) => void;
@@ -17,9 +19,36 @@ interface AppContentProps {
 const AppContent: React.FC<AppContentProps> = ({ onError }) => {
   const [tonConnectUI] = useTonConnectUI();
   const navigate = useNavigate();
-  const { backgroundImage, resetBackground } = useBackground();
+  const { backgroundImage, resetBackground, setBackgroundImage } = useBackground();
   const [isLoading, setIsLoading] = useState(true);
   console.log('Текущий фон в App:', backgroundImage);
+
+  // Обновляем статус пользователя при подключении/отключении
+  useEffect(() => {
+    const updateUserStatus = async (isOnline: boolean) => {
+      if (tonConnectUI.account?.address) {
+        try {
+          await LeaderboardService.getInstance().updateUserStatus(
+            tonConnectUI.account.address,
+            isOnline
+          );
+        } catch (error) {
+          console.error('Ошибка при обновлении статуса:', error);
+        }
+      }
+    };
+
+    if (tonConnectUI.account) {
+      updateUserStatus(true);
+    }
+
+    // Очищаем статус при размонтировании
+    return () => {
+      if (tonConnectUI.account) {
+        updateUserStatus(false);
+      }
+    };
+  }, [tonConnectUI.account]);
 
   useEffect(() => {
     if (tonConnectUI.account) {
@@ -35,6 +64,7 @@ const AppContent: React.FC<AppContentProps> = ({ onError }) => {
     try {
       await tonConnectUI.disconnect();
       navigate('/');
+      resetBackground();
       toast.success('Кошелёк успешно отключен! 👋', {
         position: 'top-right',
         autoClose: 3000,
@@ -111,6 +141,7 @@ const AppContent: React.FC<AppContentProps> = ({ onError }) => {
             <Route path="/dashboard" element={
               tonConnectUI.account ? <Dashboard /> : <Navigate to="/" replace />
             } />
+            <Route path="/leaderboard" element={<Leaderboard />} />
           </Routes>
         </main>
       </div>

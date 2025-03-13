@@ -26,12 +26,12 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ onLoadingComplete }) => {
     }
   ];
 
+  // Отдельный эффект для обновления прогресса
   useEffect(() => {
     const timer = setInterval(() => {
       setProgress(prev => {
         if (prev >= 100) {
           clearInterval(timer);
-          onLoadingComplete();
           return 100;
         }
         return prev + 1;
@@ -39,8 +39,16 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ onLoadingComplete }) => {
     }, 60); // 6 секунд = 6000мс, 100 шагов = 60мс на шаг
 
     return () => clearInterval(timer);
-  }, [onLoadingComplete]);
+  }, []);
 
+  // Отдельный эффект для вызова onLoadingComplete
+  useEffect(() => {
+    if (progress >= 100) {
+      onLoadingComplete();
+    }
+  }, [progress, onLoadingComplete]);
+
+  // Эффект для смены шагов
   useEffect(() => {
     const stepTimer = setInterval(() => {
       setCurrentStep(prev => {

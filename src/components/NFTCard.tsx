@@ -7,12 +7,12 @@ import SubscriptionService from '../services/subscription';
 
 interface NFTCardProps {
   nft: NFT;
-  onStartFarming: () => void;
-  onCollectRewards: () => void;
+  onStakeChange: (nftAddress: string, isStaking: boolean) => void;
+  onRewardCollect: () => Promise<void>;
   onError?: (error: Error) => void;
 }
 
-const NFTCard: React.FC<NFTCardProps> = ({ nft, onStartFarming, onCollectRewards, onError }) => {
+const NFTCard: React.FC<NFTCardProps> = ({ nft, onStakeChange, onRewardCollect, onError }) => {
   const [timeLeft, setTimeLeft] = useState<number>(0);
   const [isStaking, setIsStaking] = useState<boolean>(nft.isStaking);
   const [accumulatedGift, setAccumulatedGift] = useState<number>(0);
@@ -39,7 +39,7 @@ const NFTCard: React.FC<NFTCardProps> = ({ nft, onStartFarming, onCollectRewards
 
         if (remaining <= 0) {
           setIsStaking(false);
-          onCollectRewards();
+          onRewardCollect();
         }
       }
     };
@@ -47,7 +47,7 @@ const NFTCard: React.FC<NFTCardProps> = ({ nft, onStartFarming, onCollectRewards
     updateTimer();
     const timer = setInterval(updateTimer, 1000);
     return () => clearInterval(timer);
-  }, [isStaking, nft.stakingStartTime, nft.address, onCollectRewards, onError]);
+  }, [isStaking, nft.stakingStartTime, nft.address, onRewardCollect, onError]);
 
   const formatTime = (ms: number): string => {
     const hours = Math.floor(ms / (1000 * 60 * 60));
@@ -61,7 +61,7 @@ const NFTCard: React.FC<NFTCardProps> = ({ nft, onStartFarming, onCollectRewards
       setIsLoading(true);
       await NFTService.startFarming(nft.address);
       setIsStaking(true);
-      onStartFarming();
+      onStakeChange(nft.address, true);
       toast.success(`Фарминг ${nft.metadata.name} запущен! 🚀`, {
         theme: 'dark',
       });
@@ -81,7 +81,8 @@ const NFTCard: React.FC<NFTCardProps> = ({ nft, onStartFarming, onCollectRewards
       setIsLoading(true);
       await NFTService.collectReward(nft.address);
       setIsStaking(false);
-      onCollectRewards();
+      onStakeChange(nft.address, false);
+      onRewardCollect();
       setAccumulatedGift(0);
       toast.success(`Собрано ${accumulatedGift.toFixed(3)} GIFT с ${nft.metadata.name}! 🎁`, {
         theme: 'dark',
