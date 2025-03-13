@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTonConnect } from '../hooks/useTonConnect';
 import { useTonConnectUI } from '@tonconnect/ui-react';
 import NFTService from '../services/nft';
@@ -6,6 +7,7 @@ import { NFT } from '../types/nft';
 import NFTCard from './NFTCard';
 
 const Dashboard: React.FC = () => {
+  const navigate = useNavigate();
   const { connected, wallet } = useTonConnect();
   const [tonConnectUI] = useTonConnectUI();
   const [nfts, setNfts] = useState<NFT[]>([]);
@@ -62,6 +64,11 @@ const Dashboard: React.FC = () => {
 
   const farmingNFTs = nfts.filter(nft => nft.isStaking);
 
+  const handleDisconnect = async () => {
+    await tonConnectUI.disconnect();
+    navigate('/');
+  };
+
   if (!connected) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 animate-gradient">
@@ -109,7 +116,10 @@ const Dashboard: React.FC = () => {
                 <p className="text-sm text-gray-400">Ваш адрес</p>
                 <p className="text-gray-300 font-mono">{wallet?.address.slice(0, 6)}...{wallet?.address.slice(-4)}</p>
               </div>
-              <button className="button-base py-2 px-4">
+              <button 
+                onClick={handleDisconnect}
+                className="button-base py-2 px-4"
+              >
                 Выйти
               </button>
             </div>
