@@ -150,15 +150,6 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const handleDisconnect = async () => {
-    try {
-      await tonConnectUI.disconnect();
-      navigate('/');
-    } catch (error) {
-      console.error('Ошибка отключения:', error);
-    }
-  };
-
   if (!connected) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 animate-gradient">
