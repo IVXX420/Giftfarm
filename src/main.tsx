@@ -9,7 +9,7 @@ import { initTonConnect } from './config/ton';
 // Инициализируем TON Connect
 initTonConnect().catch(console.error);
 
-const manifestUrl = 'https://votipapa-fegjqf3nr-ffffffs-projects-46aa7d61.vercel.app/ton-connect-manifest.json';
+const manifestUrl = 'https://votipapa-4qyykshbm-ffffffs-projects-46aa7d61.vercel.app/ton-connect-manifest.json';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
