@@ -89,7 +89,7 @@ const NFTCard: React.FC<NFTCardProps> = ({ nft, onStartFarming, onCollectRewards
 
   return (
     <div 
-      className="backdrop-blur-lg bg-white/5 rounded-2xl border border-white/10 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.02] overflow-hidden"
+      className="backdrop-blur-lg bg-white/5 rounded-xl sm:rounded-2xl border border-white/10 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.02] overflow-hidden"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -102,27 +102,27 @@ const NFTCard: React.FC<NFTCardProps> = ({ nft, onStartFarming, onCollectRewards
           }`}
         />
         {isStaking && timeLeft > 0 && (
-          <div className="absolute top-3 right-3 backdrop-blur-md bg-black/50 px-3 py-1 rounded-full text-sm font-medium text-blue-400 border border-blue-400/30">
+          <div className="absolute top-2 right-2 sm:top-3 sm:right-3 backdrop-blur-md bg-black/50 px-2 py-0.5 sm:px-3 sm:py-1 rounded-full text-xs sm:text-sm font-medium text-blue-400 border border-blue-400/30">
             Фарминг
           </div>
         )}
-        <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/90 via-black/50 to-transparent">
-          <h3 className="text-base font-bold truncate text-white group-hover:text-blue-400 transition-colors duration-300">
+        <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-3 bg-gradient-to-t from-black/90 via-black/50 to-transparent">
+          <h3 className="text-sm sm:text-base font-bold truncate text-white group-hover:text-blue-400 transition-colors duration-300">
             {nft.metadata.name}
           </h3>
         </div>
       </div>
       
       {!isStaking && timeLeft === 0 && (
-        <div className="p-4">
+        <div className="p-3 sm:p-4">
           <button
             onClick={handleStartFarming}
             disabled={isLoading}
-            className="bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 px-4 rounded-xl text-sm font-medium w-full hover:shadow-lg hover:shadow-blue-500/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="bg-gradient-to-r from-blue-500 to-purple-600 text-white py-2 sm:py-3 px-3 sm:px-4 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium w-full hover:shadow-lg hover:shadow-blue-500/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? (
               <span className="flex items-center justify-center">
-                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <svg className="animate-spin -ml-1 mr-2 h-3 w-3 sm:h-4 sm:w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
@@ -130,7 +130,7 @@ const NFTCard: React.FC<NFTCardProps> = ({ nft, onStartFarming, onCollectRewards
               </span>
             ) : (
               <span className="flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-1.5 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
                 Начать фарм
@@ -141,25 +141,25 @@ const NFTCard: React.FC<NFTCardProps> = ({ nft, onStartFarming, onCollectRewards
       )}
 
       {isStaking && timeLeft > 0 && (
-        <div className="p-4 space-y-3">
-          <div className="backdrop-blur-md bg-black/30 rounded-xl p-3 border border-white/5">
-            <div className="flex justify-between items-center mb-2">
-              <p className="text-gray-400 text-sm">До окончания:</p>
-              <p className="text-lg font-bold bg-gradient-to-r from-blue-400 to-purple-500 text-transparent bg-clip-text animate-pulse">
+        <div className="p-3 sm:p-4 space-y-2 sm:space-y-3">
+          <div className="backdrop-blur-md bg-black/30 rounded-lg sm:rounded-xl p-2 sm:p-3 border border-white/5">
+            <div className="flex justify-between items-center mb-1.5 sm:mb-2">
+              <p className="text-gray-400 text-xs sm:text-sm">До окончания:</p>
+              <p className="text-sm sm:text-lg font-bold bg-gradient-to-r from-blue-400 to-purple-500 text-transparent bg-clip-text animate-pulse">
                 {formatTime(timeLeft)}
               </p>
             </div>
-            <div className="w-full bg-white/5 rounded-full h-1.5">
+            <div className="w-full bg-white/5 rounded-full h-1 sm:h-1.5">
               <div 
-                className="bg-gradient-to-r from-blue-400 to-purple-500 h-1.5 rounded-full transition-all duration-300"
+                className="bg-gradient-to-r from-blue-400 to-purple-500 h-1 sm:h-1.5 rounded-full transition-all duration-300"
                 style={{ width: `${(1 - timeLeft / (12 * 60 * 60 * 1000)) * 100}%` }}
               />
             </div>
           </div>
-          <div className="backdrop-blur-md bg-black/30 rounded-xl p-3 border border-white/5">
+          <div className="backdrop-blur-md bg-black/30 rounded-lg sm:rounded-xl p-2 sm:p-3 border border-white/5">
             <div className="flex justify-between items-center">
-              <p className="text-gray-400 text-sm">Накоплено:</p>
-              <p className="text-lg font-bold bg-gradient-to-r from-blue-400 to-purple-500 text-transparent bg-clip-text">
+              <p className="text-gray-400 text-xs sm:text-sm">Накоплено:</p>
+              <p className="text-sm sm:text-lg font-bold bg-gradient-to-r from-blue-400 to-purple-500 text-transparent bg-clip-text">
                 {accumulatedGift.toFixed(3)} GIFT
               </p>
             </div>
@@ -168,15 +168,15 @@ const NFTCard: React.FC<NFTCardProps> = ({ nft, onStartFarming, onCollectRewards
       )}
 
       {isStaking && timeLeft === 0 && (
-        <div className="p-4">
+        <div className="p-3 sm:p-4">
           <button
             onClick={handleCollectReward}
             disabled={isLoading}
-            className="bg-gradient-to-r from-green-500 to-emerald-600 text-white py-3 px-4 rounded-xl text-sm font-medium w-full hover:shadow-lg hover:shadow-green-500/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="bg-gradient-to-r from-green-500 to-emerald-600 text-white py-2 sm:py-3 px-3 sm:px-4 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium w-full hover:shadow-lg hover:shadow-green-500/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? (
               <span className="flex items-center justify-center">
-                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <svg className="animate-spin -ml-1 mr-2 h-3 w-3 sm:h-4 sm:w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
@@ -184,7 +184,7 @@ const NFTCard: React.FC<NFTCardProps> = ({ nft, onStartFarming, onCollectRewards
               </span>
             ) : (
               <span className="flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-1.5 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
                 Собрать {accumulatedGift.toFixed(3)} GIFT

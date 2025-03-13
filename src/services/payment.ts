@@ -53,6 +53,11 @@ class PaymentService {
     localStorage.setItem('subscription', JSON.stringify(subscriptionData));
   }
 
+  // Деактивируем подписку
+  static deactivateSubscription() {
+    localStorage.removeItem('subscription');
+  }
+
   // Получаем информацию о подписке
   static getSubscriptionInfo() {
     const subscriptionData = localStorage.getItem('subscription');
