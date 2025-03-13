@@ -74,11 +74,11 @@ const NFTCard: React.FC<NFTCardProps> = ({ nft, onBalanceUpdate }) => {
 
   return (
     <div 
-      className="bg-white rounded-lg shadow-md p-3 transform transition-all duration-300 hover:scale-[1.02] hover:shadow-lg"
+      className="bg-gray-800/50 backdrop-blur-lg rounded-lg shadow-md p-3 transform transition-all duration-300 hover:scale-[1.02] hover:shadow-lg border border-gray-700"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="relative pb-[100%] mb-3 overflow-hidden rounded-md">
+      <div className="relative pb-[100%] mb-3 overflow-hidden rounded-md border border-gray-600">
         <img 
           src={nft.metadata.image} 
           alt={nft.metadata.name} 
@@ -87,19 +87,19 @@ const NFTCard: React.FC<NFTCardProps> = ({ nft, onBalanceUpdate }) => {
           }`}
         />
         {isStaking && timeLeft > 0 && (
-          <div className="absolute top-2 right-2 bg-black/70 text-white px-2 py-0.5 rounded-full text-xs font-medium">
+          <div className="absolute top-2 right-2 bg-black/80 text-white px-2 py-0.5 rounded-full text-xs font-medium border border-gray-600">
             Фарминг
           </div>
         )}
       </div>
       
-      <h3 className="text-base font-bold mb-2 truncate text-gray-800">{nft.metadata.name}</h3>
+      <h3 className="text-base font-bold mb-2 truncate text-gray-200">{nft.metadata.name}</h3>
       
       {!isStaking && timeLeft === 0 && (
         <button
           onClick={handleStartFarming}
           disabled={isLoading}
-          className="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2 px-3 rounded-md hover:from-blue-600 hover:to-blue-700 transition-all duration-300 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed text-sm font-medium shadow-sm hover:shadow-md transform hover:-translate-y-0.5 disabled:hover:translate-y-0 disabled:hover:shadow-sm"
+          className="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2 px-3 rounded-md hover:from-blue-600 hover:to-blue-700 transition-all duration-300 disabled:from-gray-600 disabled:to-gray-700 disabled:cursor-not-allowed text-sm font-medium shadow-sm hover:shadow-md transform hover:-translate-y-0.5 disabled:hover:translate-y-0 disabled:hover:shadow-sm border border-blue-400/20"
         >
           {isLoading ? (
             <span className="flex items-center justify-center">
@@ -115,12 +115,12 @@ const NFTCard: React.FC<NFTCardProps> = ({ nft, onBalanceUpdate }) => {
 
       {isStaking && timeLeft > 0 && (
         <div className="text-center py-1">
-          <p className="text-gray-600 text-sm mb-1">До окончания фарма:</p>
-          <p className="text-xl font-bold mb-2 bg-gradient-to-r from-blue-500 to-blue-600 bg-clip-text text-transparent">
+          <p className="text-gray-400 text-sm mb-1">До окончания фарма:</p>
+          <p className="text-xl font-bold mb-2 bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
             {formatTime(timeLeft)}
           </p>
-          <p className="text-sm text-gray-700">
-            Накоплено GIFT: <span className="font-bold text-green-600">{accumulatedGift.toFixed(3)}</span>
+          <p className="text-sm text-gray-300">
+            Накоплено GIFT: <span className="font-bold text-blue-400">{accumulatedGift.toFixed(3)}</span>
           </p>
         </div>
       )}
@@ -129,7 +129,7 @@ const NFTCard: React.FC<NFTCardProps> = ({ nft, onBalanceUpdate }) => {
         <button
           onClick={handleCollectReward}
           disabled={isLoading}
-          className="w-full bg-gradient-to-r from-green-500 to-green-600 text-white py-2 px-3 rounded-md hover:from-green-600 hover:to-green-700 transition-all duration-300 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed text-sm font-medium shadow-sm hover:shadow-md transform hover:-translate-y-0.5 disabled:hover:translate-y-0 disabled:hover:shadow-sm"
+          className="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2 px-3 rounded-md hover:from-blue-600 hover:to-blue-700 transition-all duration-300 disabled:from-gray-600 disabled:to-gray-700 disabled:cursor-not-allowed text-sm font-medium shadow-sm hover:shadow-md transform hover:-translate-y-0.5 disabled:hover:translate-y-0 disabled:hover:shadow-sm border border-blue-400/20"
         >
           {isLoading ? (
             <span className="flex items-center justify-center">
