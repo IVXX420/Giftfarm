@@ -62,8 +62,8 @@ class NFTService {
       console.log('Supported collections:', SUPPORTED_COLLECTIONS);
       
       // Получаем NFT через API
-      const data = await this.makeRequest(`${this.apiEndpoint}/nft/searchItems?owner=${userAddress}&limit=1000&offset=0`);
-      const nfts = data.items || [];
+      const data = await this.makeRequest(`${this.apiEndpoint}/accounts/${userAddress}/nfts`);
+      const nfts = data.nfts || [];
       console.log('All NFTs:', nfts);
 
       // Фильтруем только NFT из поддерживаемых коллекций
