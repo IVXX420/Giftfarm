@@ -1,14 +1,5 @@
 import { SUPPORTED_COLLECTIONS, NFT } from '../types/nft';
 
-// Локальное хранилище для фарминга
-interface FarmingState {
-  [nftAddress: string]: {
-    isStaking: boolean;
-    startTime: number;
-    lastCollectTime?: number;
-  };
-}
-
 class NFTService {
   private farmingState: { [key: string]: { isStaking: boolean; startTime: number } } = {};
   private apiEndpoint: string;
@@ -18,30 +9,6 @@ class NFTService {
     this.apiEndpoint = import.meta.env.VITE_TON_ENDPOINT;
     this.apiKey = import.meta.env.VITE_TON_API_KEY;
     this.loadFarmingState();
-  }
-
-  private async makeRequest(url: string) {
-    console.log('Making request to:', url);
-    try {
-      const response = await fetch(url, {
-        headers: {
-          'X-API-Key': this.apiKey,
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-      });
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('API Error:', errorText);
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
-      console.log('Response data:', data);
-      return data;
-    } catch (error) {
-      console.error('Request error:', error);
-      throw error;
-    }
   }
 
   private loadFarmingState() {
