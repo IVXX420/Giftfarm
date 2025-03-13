@@ -1,7 +1,7 @@
 {
-  "url": "http://localhost:3000",
-  "name": "TON NFT Farm",
-  "iconUrl": "http://localhost:3000/logo.png",
-  "termsOfUseUrl": "http://localhost:3000/terms",
-  "privacyPolicyUrl": "http://localhost:3000/privacy"
+  "url": "https://giftfarm.vercel.app",
+  "name": "Gift Farm",
+  "iconUrl": "https://giftfarm.vercel.app/logo.png",
+  "termsOfUseUrl": "https://giftfarm.vercel.app/terms",
+  "privacyPolicyUrl": "https://giftfarm.vercel.app/privacy"
 } 
