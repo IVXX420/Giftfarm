@@ -27,9 +27,9 @@ class NFTService {
   private formatAddress(address: string): string {
     try {
       // Преобразуем адрес в объект Address из @ton/core
-      const formattedAddress = Address.parse(address);
-      // Получаем адрес в формате без bounce
-      return formattedAddress.toString();
+      const formattedAddress = Address.parse(address).toString({ urlSafe: true, bounceable: true });
+      console.log('Отформатированный адрес:', formattedAddress);
+      return formattedAddress;
     } catch (error) {
       console.error('Ошибка при форматировании адреса:', error);
       return address;
@@ -64,9 +64,10 @@ class NFTService {
   // Получить список всех NFT на кошельке
   private async fetchAccountNFTs(address: string): Promise<any[]> {
     try {
-      console.log('Запрашиваем NFT по адресу:', `${this.apiEndpoint}/accounts/${address}/nfts?limit=1000`);
+      const apiUrl = `${this.apiEndpoint}/accounts/${address}/nfts?limit=1000`;
+      console.log('Запрашиваем NFT по адресу:', apiUrl);
       
-      const response = await fetch(`${this.apiEndpoint}/accounts/${address}/nfts?limit=1000`, {
+      const response = await fetch(apiUrl, {
         headers: {
           'Authorization': `Bearer ${this.apiKey}`,
           'Accept': 'application/json',
@@ -80,8 +81,17 @@ class NFTService {
       }
 
       const data = await response.json();
-      console.log('Ответ от API:', data);
-      return data.nfts || [];
+      console.log('Сырой ответ от API:', data);
+      
+      // Проверяем наличие nft_items в ответе
+      if (!data.nft_items && !data.nfts) {
+        console.error('Неожиданный формат ответа API:', data);
+        return [];
+      }
+
+      const nfts = data.nft_items || data.nfts || [];
+      console.log('Обработанные NFT из ответа:', nfts);
+      return nfts;
     } catch (error) {
       console.error('Ошибка при получении списка NFT:', error);
       throw error;
@@ -101,13 +111,22 @@ class NFTService {
         metadata: nft.metadata
       });
       
+      if (!collectionAddress) {
+        console.log(`NFT ${nft.address} не имеет адреса коллекции`);
+        return false;
+      }
+
+      // Форматируем адрес коллекции в том же формате
+      const formattedCollectionAddress = this.formatAddress(collectionAddress);
+      
       const isSupported = SUPPORTED_COLLECTIONS.some(collection => {
-        const matches = collection.address.toLowerCase() === collectionAddress?.toLowerCase();
-        console.log(`Сравниваем: ${collection.address} с ${collectionAddress} = ${matches}`);
+        const formattedSupportedAddress = this.formatAddress(collection.address);
+        const matches = formattedSupportedAddress === formattedCollectionAddress;
+        console.log(`Сравниваем: ${formattedSupportedAddress} с ${formattedCollectionAddress} = ${matches}`);
         return matches;
       });
       
-      console.log(`NFT ${nft.address} из коллекции ${collectionAddress} поддерживается: ${isSupported}`);
+      console.log(`NFT ${nft.address} из коллекции ${formattedCollectionAddress} поддерживается: ${isSupported}`);
       return isSupported;
     });
   }
