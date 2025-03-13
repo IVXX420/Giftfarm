@@ -14,6 +14,7 @@ const Dashboard: React.FC = () => {
   const [totalGift, setTotalGift] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [selectedTab, setSelectedTab] = useState<'all' | 'farming'>('all');
+  const [isConnecting, setIsConnecting] = useState<boolean>(false);
 
   // Загрузка NFT
   const loadNFTs = async () => {
@@ -64,9 +65,27 @@ const Dashboard: React.FC = () => {
 
   const farmingNFTs = nfts.filter(nft => nft.isStaking);
 
+  const handleConnect = async () => {
+    if (isConnecting || connected) return;
+    
+    try {
+      setIsConnecting(true);
+      await tonConnectUI.connectWallet();
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('Ошибка подключения:', error);
+    } finally {
+      setIsConnecting(false);
+    }
+  };
+
   const handleDisconnect = async () => {
-    await tonConnectUI.disconnect();
-    navigate('/');
+    try {
+      await tonConnectUI.disconnect();
+      navigate('/');
+    } catch (error) {
+      console.error('Ошибка отключения:', error);
+    }
   };
 
   if (!connected) {
@@ -88,10 +107,11 @@ const Dashboard: React.FC = () => {
           </p>
           <div className="flex justify-center">
             <button 
-              onClick={() => tonConnectUI.connectWallet()}
+              onClick={handleConnect}
+              disabled={isConnecting}
               className="button-base py-3 px-6 text-lg font-medium w-full max-w-xs hover:shadow-glow"
             >
-              Подключить кошелёк
+              {isConnecting ? 'Подключение...' : 'Подключить кошелёк'}
             </button>
           </div>
         </div>
