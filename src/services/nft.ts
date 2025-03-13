@@ -15,7 +15,7 @@ class NFTService {
   private apiKey: string;
 
   constructor() {
-    this.apiEndpoint = import.meta.env.VITE_TON_ENDPOINT;
+    this.apiEndpoint = import.meta.env.VITE_TON_ENDPOINT.replace(/\/$/, '');
     this.apiKey = import.meta.env.VITE_TON_API_KEY;
     this.loadFarmingState();
   }
@@ -25,9 +25,11 @@ class NFTService {
     try {
       const response = await fetch(url, {
         headers: {
-          'Authorization': `Bearer ${this.apiKey}`,
+          'X-API-Key': this.apiKey,
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
         },
+        mode: 'cors',
       });
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
