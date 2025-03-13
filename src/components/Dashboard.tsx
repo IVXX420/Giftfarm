@@ -9,7 +9,6 @@ import NFTCard from './NFTCard';
 import SubscriptionPanel from './SubscriptionPanel';
 import StatsPanel from './StatsPanel';
 import Logo from './Logo';
-import Header from './Header';
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -190,9 +189,6 @@ const Dashboard: React.FC = () => {
   return (
     <div className="min-h-screen animate-gradient py-4 sm:py-8">
       <div className="container mx-auto px-2 sm:px-4 max-w-4xl">
-        {/* Хедер с кошельком */}
-        <Header onDisconnect={handleDisconnect} />
-
         {/* Информационная панель */}
         <StatsPanel
           totalGift={totalGift}
