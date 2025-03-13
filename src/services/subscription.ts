@@ -1,13 +1,5 @@
 import PaymentService from './payment';
 
-interface TonConnectTransaction {
-  validUntil: number;
-  messages: Array<{
-    address: string;
-    amount: string;
-  }>;
-}
-
 interface TonConnectResult {
   boc: string;
   [key: string]: any;
