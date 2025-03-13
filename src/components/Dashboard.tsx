@@ -8,6 +8,8 @@ import { NFT } from '../types/nft';
 import NFTCard from './NFTCard';
 import SubscriptionPanel from './SubscriptionPanel';
 import StatsPanel from './StatsPanel';
+import Logo from './Logo';
+import Header from './Header';
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -162,6 +164,9 @@ const Dashboard: React.FC = () => {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 animate-gradient">
         <div className="glass-panel p-8 max-w-md w-full hover-scale">
+          <div className="flex justify-center mb-8">
+            <Logo />
+          </div>
           <h1 className="text-4xl font-bold mb-6 text-center gradient-text">
             GIFT Farm
           </h1>
@@ -185,25 +190,8 @@ const Dashboard: React.FC = () => {
   return (
     <div className="min-h-screen animate-gradient py-4 sm:py-8">
       <div className="container mx-auto px-2 sm:px-4 max-w-4xl">
-        {/* Кошелек в правом верхнем углу */}
-        <div className="flex justify-end mb-4">
-          <div className="flex items-center space-x-4">
-            <div className="text-right">
-              <p className="text-xs sm:text-sm text-gray-400 mb-1">Ваш адрес</p>
-              <div className="glass-panel px-3 py-1.5">
-                <p className="text-xs sm:text-sm font-mono text-gray-300">
-                  {wallet?.shortAddress}
-                </p>
-              </div>
-            </div>
-            <button 
-              onClick={handleDisconnect}
-              className="button-base py-1.5 sm:py-2 px-3 sm:px-4 text-sm sm:text-base"
-            >
-              Выйти
-            </button>
-          </div>
-        </div>
+        {/* Хедер с кошельком */}
+        <Header onDisconnect={handleDisconnect} />
 
         {/* Информационная панель */}
         <StatsPanel
