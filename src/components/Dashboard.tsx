@@ -5,8 +5,6 @@ import { useTonConnectUI } from '@tonconnect/ui-react';
 import NFTService from '../services/nft';
 import SubscriptionService from '../services/subscription';
 import { NFT } from '../types/nft';
-import NFTCard from './NFTCard';
-import SubscriptionPanel from './SubscriptionPanel';
 import Logo from './Logo';
 
 const Dashboard: React.FC = () => {
@@ -16,7 +14,6 @@ const Dashboard: React.FC = () => {
   const [nfts, setNfts] = useState<NFT[]>([]);
   const [totalGift, setTotalGift] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [selectedTab, setSelectedTab] = useState<'all' | 'farming'>('all');
   const [isConnecting, setIsConnecting] = useState<boolean>(false);
   const [isSubscribed, setIsSubscribed] = useState<boolean>(false);
 
