@@ -1,4 +1,3 @@
-import { TonClient } from '@ton/ton';
 import { SUPPORTED_COLLECTIONS, NFT } from '../types/nft';
 
 // Локальное хранилище для фарминга
