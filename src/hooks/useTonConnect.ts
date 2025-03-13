@@ -17,8 +17,18 @@ export function useTonConnect() {
   }, [tonConnectUI.account]);
 
   useEffect(() => {
-    updateWallet();
-  }, [updateWallet]);
+    // Проверяем состояние подключения при инициализации
+    tonConnectUI.connectionRestored.then(() => {
+      updateWallet();
+    });
+
+    // Подписываемся на изменения состояния подключения
+    const unsubscribe = tonConnectUI.onStatusChange(updateWallet);
+
+    return () => {
+      unsubscribe();
+    };
+  }, [tonConnectUI, updateWallet]);
 
   return {
     connected: tonConnectUI.connected,
