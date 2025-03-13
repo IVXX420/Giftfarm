@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
-import { useTonConnectUI, TonConnectUI } from '@tonconnect/ui-react';
+import { useTonConnectUI } from '@tonconnect/ui-react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Dashboard from './components/Dashboard';
@@ -19,7 +19,7 @@ interface AppContentProps {
 const AppContent: React.FC<AppContentProps> = ({ onError }) => {
   const [tonConnectUI] = useTonConnectUI();
   const navigate = useNavigate();
-  const { backgroundImage, resetBackground, setBackgroundImage } = useBackground();
+  const { backgroundImage, resetBackground } = useBackground();
   const [isLoading, setIsLoading] = useState(true);
   console.log('Текущий фон в App:', backgroundImage);
 

@@ -89,7 +89,7 @@ class SubscriptionService {
 
   static async cancelSubscription(): Promise<boolean> {
     try {
-      await PaymentService.deactivateSubscription();
+      PaymentService.deactivateSubscription();
       this.deactivatePremium();
       return true;
     } catch (error) {
