@@ -48,21 +48,6 @@ class SubscriptionService {
       throw error;
     }
   }
-
-  // Отменить подписку
-  static async unsubscribe(): Promise<boolean> {
-    try {
-      console.log('Начало отмены подписки');
-      
-      // Деактивируем подписку
-      PaymentService.deactivateSubscription();
-      console.log('Подписка деактивирована');
-      return true;
-    } catch (error) {
-      console.error('Ошибка при отмене подписки:', error);
-      throw error;
-    }
-  }
 }
 
 export default SubscriptionService; 
