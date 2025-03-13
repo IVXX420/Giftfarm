@@ -133,8 +133,12 @@ const Dashboard: React.FC = () => {
             </div>
             <div className="flex items-center space-x-4">
               <div className="text-right">
-                <p className="text-sm text-gray-400">Ваш адрес</p>
-                <p className="text-gray-300 font-mono">{wallet?.address.slice(0, 6)}...{wallet?.address.slice(-4)}</p>
+                <p className="text-sm text-gray-400 mb-1">Ваш адрес</p>
+                <div className="glass-panel px-3 py-1.5 min-w-[180px]">
+                  <p className="text-sm font-mono text-gray-300 truncate">
+                    {wallet?.address}
+                  </p>
+                </div>
               </div>
               <button 
                 onClick={handleDisconnect}
