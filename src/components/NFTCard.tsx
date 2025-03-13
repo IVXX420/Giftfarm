@@ -74,11 +74,11 @@ const NFTCard: React.FC<NFTCardProps> = ({ nft, onBalanceUpdate }) => {
 
   return (
     <div 
-      className="card-base p-4 hover:scale-[1.02] hover:shadow-xl group bg-black/30"
+      className="glass-panel hover-scale"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="relative pb-[100%] mb-4 overflow-hidden rounded-xl border border-gray-700/50 group-hover:border-blue-400/30 transition-all duration-300">
+      <div className="relative pb-[100%] overflow-hidden rounded-xl border border-white/10 group">
         <img 
           src={nft.metadata.image} 
           alt={nft.metadata.name} 
@@ -87,7 +87,7 @@ const NFTCard: React.FC<NFTCardProps> = ({ nft, onBalanceUpdate }) => {
           }`}
         />
         {isStaking && timeLeft > 0 && (
-          <div className="absolute top-3 right-3 bg-black/80 text-white px-3 py-1 rounded-full text-sm font-medium border border-blue-400/30 backdrop-blur-sm animate-pulse">
+          <div className="absolute top-3 right-3 glass-panel px-3 py-1 rounded-full text-sm font-medium animate-pulse">
             Фарминг
           </div>
         )}
@@ -99,33 +99,35 @@ const NFTCard: React.FC<NFTCardProps> = ({ nft, onBalanceUpdate }) => {
       </div>
       
       {!isStaking && timeLeft === 0 && (
-        <button
-          onClick={handleStartFarming}
-          disabled={isLoading}
-          className="button-base py-3 px-4 text-sm font-medium w-full"
-        >
-          {isLoading ? (
-            <span className="flex items-center justify-center">
-              <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              <span className="animate-pulse">Запуск...</span>
-            </span>
-          ) : (
-            <span className="flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
-              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-              Начать фарм
-            </span>
-          )}
-        </button>
+        <div className="p-4">
+          <button
+            onClick={handleStartFarming}
+            disabled={isLoading}
+            className="button-base py-3 px-4 text-sm font-medium w-full hover:shadow-glow"
+          >
+            {isLoading ? (
+              <span className="flex items-center justify-center">
+                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span className="animate-pulse">Запуск...</span>
+              </span>
+            ) : (
+              <span className="flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
+                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                Начать фарм
+              </span>
+            )}
+          </button>
+        </div>
       )}
 
       {isStaking && timeLeft > 0 && (
-        <div className="space-y-3">
-          <div className="bg-blue-900/30 rounded-lg p-3">
+        <div className="p-4 space-y-3">
+          <div className="glass-panel p-3">
             <div className="flex justify-between items-center mb-2">
               <p className="text-gray-400 text-sm">До окончания:</p>
               <p className="text-lg font-bold gradient-text animate-pulse">
@@ -139,10 +141,10 @@ const NFTCard: React.FC<NFTCardProps> = ({ nft, onBalanceUpdate }) => {
               />
             </div>
           </div>
-          <div className="bg-blue-900/30 rounded-lg p-3">
+          <div className="glass-panel p-3">
             <div className="flex justify-between items-center">
               <p className="text-gray-400 text-sm">Накоплено:</p>
-              <p className="text-lg font-bold text-blue-400">
+              <p className="text-lg font-bold gradient-text">
                 {accumulatedGift.toFixed(3)} GIFT
               </p>
             </div>
@@ -151,28 +153,30 @@ const NFTCard: React.FC<NFTCardProps> = ({ nft, onBalanceUpdate }) => {
       )}
 
       {isStaking && timeLeft === 0 && (
-        <button
-          onClick={handleCollectReward}
-          disabled={isLoading}
-          className="button-base py-3 px-4 text-sm font-medium w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
-        >
-          {isLoading ? (
-            <span className="flex items-center justify-center">
-              <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              <span className="animate-pulse">Сбор...</span>
-            </span>
-          ) : (
-            <span className="flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
-              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-              Собрать {accumulatedGift.toFixed(3)} GIFT
-            </span>
-          )}
-        </button>
+        <div className="p-4">
+          <button
+            onClick={handleCollectReward}
+            disabled={isLoading}
+            className="button-base py-3 px-4 text-sm font-medium w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 hover:shadow-[0_0_15px_rgba(34,197,94,0.5)]"
+          >
+            {isLoading ? (
+              <span className="flex items-center justify-center">
+                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span className="animate-pulse">Сбор...</span>
+              </span>
+            ) : (
+              <span className="flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
+                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                Собрать {accumulatedGift.toFixed(3)} GIFT
+              </span>
+            )}
+          </button>
+        </div>
       )}
     </div>
   );

@@ -62,19 +62,23 @@ const Dashboard: React.FC = () => {
 
   if (!connected) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gradient-to-br from-gray-900 via-blue-900 to-black animate-gradient">
-        <div className="card-base p-8 max-w-md w-full hover:scale-[1.02] hover:shadow-2xl animate-fadeIn bg-black/30">
+      <div className="min-h-screen flex items-center justify-center p-4 animate-gradient">
+        <div className="glass-panel p-8 max-w-md w-full hover-scale">
           <div className="flex justify-center mb-8">
-            <img src="/gift-logo.png" alt="GIFT Farm" className="h-24 w-24 animate-pulse" />
+            <img 
+              src="/gift-logo.png" 
+              alt="GIFT Farm" 
+              className="h-24 w-24 animate-bounce-sm"
+            />
           </div>
-          <h1 className="text-4xl font-bold mb-6 text-center gradient-text animate-pulse">
+          <h1 className="text-4xl font-bold mb-6 text-center gradient-text">
             GIFT Farm
           </h1>
           <p className="text-gray-300 text-center text-lg mb-8 animate-fadeIn delay-200">
             Подключите TON Keeper для доступа к фармингу
           </p>
           <div className="flex justify-center">
-            <button className="button-base py-3 px-6 text-lg font-medium">
+            <button className="button-base py-3 px-6 text-lg font-medium w-full max-w-xs hover:shadow-glow">
               Подключить кошелёк
             </button>
           </div>
@@ -84,10 +88,10 @@ const Dashboard: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-black animate-gradient">
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <div className="min-h-screen animate-gradient py-8">
+      <div className="container mx-auto px-4 max-w-4xl">
         {/* Верхняя панель */}
-        <div className="card-base p-6 mb-8 hover:shadow-2xl animate-fadeIn bg-black/30">
+        <div className="glass-panel p-6 mb-8 hover-scale">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center">
               <img src="/gift-logo.png" alt="GIFT Farm" className="h-12 w-12 mr-4" />
@@ -106,20 +110,20 @@ const Dashboard: React.FC = () => {
             </div>
           </div>
           <div className="grid grid-cols-3 gap-6">
-            <div className="card-base bg-blue-900/30 p-4 text-center">
-              <p className="text-gray-400 text-sm mb-1">Баланс GIFT</p>
+            <div className="glass-panel p-4 text-center hover-scale">
+              <p className="text-sm text-gray-400 mb-1">Баланс GIFT</p>
               <p className="text-2xl font-bold gradient-text animate-pulse">
                 {totalGift.toFixed(3)}
               </p>
             </div>
-            <div className="card-base bg-blue-900/30 p-4 text-center">
-              <p className="text-gray-400 text-sm mb-1">Всего NFT</p>
+            <div className="glass-panel p-4 text-center hover-scale">
+              <p className="text-sm text-gray-400 mb-1">Всего NFT</p>
               <p className="text-2xl font-bold text-blue-400">
                 {nfts.length}
               </p>
             </div>
-            <div className="card-base bg-blue-900/30 p-4 text-center">
-              <p className="text-gray-400 text-sm mb-1">Фармится</p>
+            <div className="glass-panel p-4 text-center hover-scale">
+              <p className="text-sm text-gray-400 mb-1">Фармится</p>
               <p className="text-2xl font-bold text-green-400">
                 {farmingNFTs.length}
               </p>
@@ -130,20 +134,20 @@ const Dashboard: React.FC = () => {
         {/* Табы */}
         <div className="flex space-x-4 mb-6">
           <button 
-            className={`px-6 py-3 rounded-lg font-medium transition-all duration-300 ${
+            className={`px-6 py-3 rounded-lg font-medium transition-all duration-300 hover-scale ${
               selectedTab === 'all' 
-                ? 'bg-blue-600 text-white shadow-lg' 
-                : 'bg-gray-800/50 text-gray-400 hover:bg-gray-800'
+                ? 'bg-blue-600 text-white shadow-glow' 
+                : 'glass-panel text-gray-400 hover:text-white'
             }`}
             onClick={() => setSelectedTab('all')}
           >
             Все NFT ({nfts.length})
           </button>
           <button 
-            className={`px-6 py-3 rounded-lg font-medium transition-all duration-300 ${
+            className={`px-6 py-3 rounded-lg font-medium transition-all duration-300 hover-scale ${
               selectedTab === 'farming' 
-                ? 'bg-blue-600 text-white shadow-lg' 
-                : 'bg-gray-800/50 text-gray-400 hover:bg-gray-800'
+                ? 'bg-blue-600 text-white shadow-glow' 
+                : 'glass-panel text-gray-400 hover:text-white'
             }`}
             onClick={() => setSelectedTab('farming')}
           >
@@ -153,8 +157,8 @@ const Dashboard: React.FC = () => {
 
         {/* Загрузка */}
         {isLoading && (
-          <div className="card-base p-12 text-center animate-fadeIn bg-black/30">
-            <div className="inline-block animate-bounce">
+          <div className="glass-panel p-12 text-center animate-fadeIn">
+            <div className="inline-block animate-bounce-sm">
               <svg className="animate-spin h-16 w-16 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -166,7 +170,7 @@ const Dashboard: React.FC = () => {
 
         {/* Пустое состояние */}
         {!isLoading && nfts.length === 0 && (
-          <div className="card-base p-12 text-center animate-fadeIn bg-black/30">
+          <div className="glass-panel p-12 text-center animate-fadeIn">
             <svg className="mx-auto h-24 w-24 text-gray-600 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
             </svg>

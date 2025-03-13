@@ -2,8 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@import './styles/animations.css';
-
 @layer base {
   :root {
     font-family: 'Inter', system-ui, sans-serif;
@@ -12,13 +10,14 @@
   }
 
   body {
-    @apply m-0 min-h-screen bg-gray-900 text-white;
+    @apply m-0 min-h-screen text-white;
+    background: linear-gradient(to bottom right, #111827, #1e3a8a, #111827);
   }
 }
 
 @layer components {
   .card-base {
-    @apply rounded-xl shadow-lg backdrop-blur-sm transition-all duration-300;
+    @apply rounded-xl shadow-lg backdrop-blur-sm transition-all duration-300 bg-black/30 hover:shadow-xl;
   }
 
   .gradient-text {
@@ -34,15 +33,23 @@
            disabled:hover:translate-y-0 disabled:hover:shadow-sm 
            border border-blue-400/20 hover:border-blue-400/40;
   }
+
+  .glass-panel {
+    @apply bg-black/30 backdrop-blur-sm border border-white/10 rounded-xl shadow-xl;
+  }
+
+  .hover-scale {
+    @apply transition-transform duration-300 hover:scale-[1.02];
+  }
 }
 
 .animate-gradient {
-  background-size: 200% 200%;
+  background-size: 400% 400%;
   animation: gradient 8s linear infinite;
 }
 
 .animate-fadeIn {
-  animation: fadeIn 0.5s ease-in-out;
+  animation: fadeIn 0.5s ease-in-out forwards;
 }
 
 .delay-100 {
@@ -67,11 +74,11 @@
 }
 
 @keyframes fadeIn {
-  0% {
+  from {
     opacity: 0;
     transform: translateY(10px);
   }
-  100% {
+  to {
     opacity: 1;
     transform: translateY(0);
   }
