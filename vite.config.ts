@@ -20,6 +20,7 @@ export default defineConfig({
       '@': resolve(__dirname, 'src'),
     },
   },
+  base: '/Giftfarm/',
   build: {
     outDir: 'dist',
     sourcemap: true,
