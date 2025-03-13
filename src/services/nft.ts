@@ -21,16 +21,24 @@ class NFTService {
   }
 
   private async makeRequest(url: string) {
-    const response = await fetch(url, {
-      headers: {
-        'Authorization': `Bearer ${this.apiKey}`,
-        'Content-Type': 'application/json',
-      },
-    });
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+    console.log('Making request to:', url);
+    try {
+      const response = await fetch(url, {
+        headers: {
+          'Authorization': `Bearer ${this.apiKey}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      console.log('Response data:', data);
+      return data;
+    } catch (error) {
+      console.error('Request error:', error);
+      throw error;
     }
-    return response.json();
   }
 
   private loadFarmingState() {
@@ -47,16 +55,23 @@ class NFTService {
   // Получить все NFT пользователя
   async getUserNFTs(userAddress: string): Promise<NFT[]> {
     try {
+      console.log('Getting NFTs for address:', userAddress);
+      console.log('Supported collections:', SUPPORTED_COLLECTIONS);
+      
       // Получаем NFT через API
-      const data = await this.makeRequest(`${this.apiEndpoint}/v2/accounts/${userAddress}/nfts`);
+      const data = await this.makeRequest(`${this.apiEndpoint}/getWalletNfts?address=${userAddress}`);
       const nfts = data.nfts || [];
+      console.log('All NFTs:', nfts);
 
       // Фильтруем только NFT из поддерживаемых коллекций
-      const supportedNFTs = nfts.filter((nft: any) => 
-        SUPPORTED_COLLECTIONS.some(collection => 
+      const supportedNFTs = nfts.filter((nft: any) => {
+        const isSupported = SUPPORTED_COLLECTIONS.some(collection => 
           collection.address === nft.collection_address
-        )
-      );
+        );
+        console.log('NFT:', nft.address, 'Collection:', nft.collection_address, 'Is supported:', isSupported);
+        return isSupported;
+      });
+      console.log('Supported NFTs:', supportedNFTs);
 
       // Получаем метаданные для каждого NFT
       const nftsWithMetadata = await Promise.all(
@@ -75,6 +90,7 @@ class NFTService {
         })
       );
 
+      console.log('NFTs with metadata:', nftsWithMetadata);
       return nftsWithMetadata;
     } catch (error) {
       console.error('Ошибка при получении NFT:', error);
@@ -85,7 +101,9 @@ class NFTService {
   // Получить метаданные NFT
   private async getNFTMetadata(nftAddress: string) {
     try {
-      const metadata = await this.makeRequest(`${this.apiEndpoint}/v2/nfts/${nftAddress}/metadata`);
+      console.log('Getting metadata for NFT:', nftAddress);
+      const metadata = await this.makeRequest(`${this.apiEndpoint}/getNftItemMetadata?address=${nftAddress}`);
+      console.log('NFT metadata:', metadata);
       
       return {
         name: metadata.name || 'Unnamed NFT',
