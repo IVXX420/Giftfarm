@@ -12,6 +12,7 @@ const NFTCard: React.FC<NFTCardProps> = ({ nft, onBalanceUpdate }) => {
   const [isStaking, setIsStaking] = useState<boolean>(nft.isStaking);
   const [accumulatedGift, setAccumulatedGift] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isHovered, setIsHovered] = useState<boolean>(false);
 
   useEffect(() => {
     const updateTimer = () => {
@@ -72,33 +73,54 @@ const NFTCard: React.FC<NFTCardProps> = ({ nft, onBalanceUpdate }) => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-4">
-      <div className="relative pb-[100%] mb-4">
+    <div 
+      className="bg-white rounded-xl shadow-lg p-4 transform transition-all duration-300 hover:scale-[1.02] hover:shadow-xl"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <div className="relative pb-[100%] mb-4 overflow-hidden rounded-lg">
         <img 
           src={nft.metadata.image} 
           alt={nft.metadata.name} 
-          className="absolute top-0 left-0 w-full h-full object-cover rounded-md"
+          className={`absolute top-0 left-0 w-full h-full object-cover transition-transform duration-300 ${
+            isHovered ? 'scale-110' : 'scale-100'
+          }`}
         />
+        {isStaking && timeLeft > 0 && (
+          <div className="absolute top-2 right-2 bg-black/70 text-white px-3 py-1 rounded-full text-sm font-medium">
+            Фарминг
+          </div>
+        )}
       </div>
       
-      <h3 className="text-lg font-bold mb-3 truncate">{nft.metadata.name}</h3>
+      <h3 className="text-lg font-bold mb-3 truncate text-gray-800">{nft.metadata.name}</h3>
       
       {!isStaking && timeLeft === 0 && (
         <button
           onClick={handleStartFarming}
           disabled={isLoading}
-          className="w-full bg-blue-500 text-white py-3 px-4 rounded-md hover:bg-blue-600 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed text-lg font-medium"
+          className="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-3 px-4 rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-300 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed text-lg font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5 disabled:hover:translate-y-0 disabled:hover:shadow-md"
         >
-          {isLoading ? 'Запуск...' : 'Начать фарм'}
+          {isLoading ? (
+            <span className="flex items-center justify-center">
+              <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Запуск...
+            </span>
+          ) : 'Начать фарм'}
         </button>
       )}
 
       {isStaking && timeLeft > 0 && (
         <div className="text-center py-2">
           <p className="text-gray-600 mb-2">До окончания фарма:</p>
-          <p className="text-2xl font-bold mb-3">{formatTime(timeLeft)}</p>
+          <p className="text-2xl font-bold mb-3 bg-gradient-to-r from-blue-500 to-blue-600 bg-clip-text text-transparent">
+            {formatTime(timeLeft)}
+          </p>
           <p className="text-lg text-gray-700">
-            Накоплено GIFT: <span className="font-bold">{accumulatedGift.toFixed(3)}</span>
+            Накоплено GIFT: <span className="font-bold text-green-600">{accumulatedGift.toFixed(3)}</span>
           </p>
         </div>
       )}
@@ -107,9 +129,17 @@ const NFTCard: React.FC<NFTCardProps> = ({ nft, onBalanceUpdate }) => {
         <button
           onClick={handleCollectReward}
           disabled={isLoading}
-          className="w-full bg-green-500 text-white py-3 px-4 rounded-md hover:bg-green-600 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed text-lg font-medium"
+          className="w-full bg-gradient-to-r from-green-500 to-green-600 text-white py-3 px-4 rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-300 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed text-lg font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5 disabled:hover:translate-y-0 disabled:hover:shadow-md"
         >
-          {isLoading ? 'Сбор...' : `Собрать ${accumulatedGift.toFixed(3)} GIFT`}
+          {isLoading ? (
+            <span className="flex items-center justify-center">
+              <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Сбор...
+            </span>
+          ) : `Собрать ${accumulatedGift.toFixed(3)} GIFT`}
         </button>
       )}
     </div>
