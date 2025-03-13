@@ -4,7 +4,7 @@ import { Address } from '@ton/core';
 
 export function useTonConnect() {
   const [tonConnectUI] = useTonConnectUI();
-  const [wallet, setWallet] = useState<{ address: string; chain: string } | null>(null);
+  const [wallet, setWallet] = useState<{ address: string; chain: string; shortAddress: string } | null>(null);
 
   const formatAddress = (address: string): string => {
     try {
@@ -15,10 +15,17 @@ export function useTonConnect() {
     }
   };
 
+  const shortenAddress = (address: string): string => {
+    if (address.length < 10) return address;
+    return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  };
+
   const updateWallet = useCallback(() => {
     if (tonConnectUI.account) {
+      const formattedAddress = formatAddress(tonConnectUI.account.address);
       setWallet({
-        address: formatAddress(tonConnectUI.account.address),
+        address: formattedAddress,
+        shortAddress: shortenAddress(formattedAddress),
         chain: tonConnectUI.account.chain,
       });
     } else {
