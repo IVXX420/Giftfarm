@@ -10,13 +10,16 @@ class PaymentService {
   // Создаем транзакцию для оплаты подписки
   static async createSubscriptionPayment() {
     try {
+      // Конвертируем BigInt в строку
+      const amount = toNano(this.SUBSCRIPTION_PRICE.toString());
+      
       // Формируем данные для транзакции
       const transaction = {
         validUntil: Math.floor(Date.now() / 1000) + 300, // 5 минут на оплату
         messages: [
           {
             address: this.OWNER_ADDRESS,
-            amount: toNano(this.SUBSCRIPTION_PRICE.toString()),
+            amount: amount.toString(10), // Преобразуем BigInt в строку
             stateInit: null,
             payload: ''
           },
