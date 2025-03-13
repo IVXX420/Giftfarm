@@ -11,13 +11,25 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+        },
+      },
+    },
   },
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src'),
+      buffer: 'buffer/',
+      process: 'process/browser',
+      stream: 'stream-browserify',
+      util: 'util/',
     },
   },
   define: {
+    'process.env': {},
     global: 'globalThis',
   },
   optimizeDeps: {
@@ -25,6 +37,7 @@ export default defineConfig({
       define: {
         global: 'globalThis'
       }
-    }
+    },
+    include: ['buffer', 'process']
   }
 }); 

@@ -1,4 +1,12 @@
+// Полифилы должны быть первыми импортами
 import { Buffer } from 'buffer';
+import process from 'process';
+
+if (typeof window !== 'undefined') {
+  window.Buffer = Buffer;
+  window.process = process;
+}
+
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { WebAppProvider } from '@vkruglikov/react-telegram-web-app';
@@ -11,9 +19,6 @@ import { initTonConnect } from './config/ton';
 initTonConnect().catch(console.error);
 
 const manifestUrl = 'https://votipapa.vercel.app/ton-connect-manifest.json';
-
-// Добавляем Buffer в глобальную область видимости
-window.Buffer = Buffer;
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
