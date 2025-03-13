@@ -1,4 +1,4 @@
-interface TonKeeper {
+export interface TonKeeper {
   ready: boolean;
   account: {
     address: string;

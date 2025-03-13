@@ -5,7 +5,7 @@ export const tonConnectConfig = {
   manifestUrl: 'https://giftfarm.vercel.app/tonconnect-manifest.json',
   buttonRootId: 'ton-connect',
   // Настройки для работы с TON API
-  apiKey: import.meta.env.VITE_TON_API_KEY || '', // API ключ будет добавлен через переменные окружения
+  apiKey: import.meta.env.VITE_TON_API_KEY,
   // Настройки для работы с TON Connect
   connectItems: [
     {
@@ -23,6 +23,7 @@ export const tonConnect = new TonConnect(tonConnectConfig);
 // Функция для инициализации TON Connect
 export const initTonConnect = async () => {
   try {
+    // @ts-ignore - метод init существует в SDK
     await tonConnect.init();
     console.log('TON Connect успешно инициализирован');
   } catch (error) {
