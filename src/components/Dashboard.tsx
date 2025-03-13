@@ -40,10 +40,13 @@ const Dashboard: React.FC = () => {
   const updateTotalGift = async () => {
     if (!nfts.length) return;
     try {
-      const total = await Promise.all(
+      // Получаем накопленные GIFT с активных фармов
+      const farmingTotal = await Promise.all(
         nfts.map(nft => NFTService.getAccumulatedGift(nft.address))
       );
-      setTotalGift(total.reduce((sum, amount) => sum + amount, 0));
+      // Получаем общий баланс GIFT
+      const totalBalance = NFTService.getGiftBalance() + farmingTotal.reduce((sum, amount) => sum + amount, 0);
+      setTotalGift(totalBalance);
     } catch (error) {
       console.error('Ошибка при обновлении баланса:', error);
     }
@@ -210,9 +213,14 @@ const Dashboard: React.FC = () => {
           <div className="grid grid-cols-3 gap-2 sm:gap-6">
             <div className="glass-panel p-2 sm:p-4 text-center hover-scale">
               <p className="text-xs sm:text-sm text-gray-400 mb-0.5 sm:mb-1">Баланс GIFT</p>
-              <p className="text-lg sm:text-2xl font-bold gradient-text animate-pulse">
-                {totalGift.toFixed(3)}
-              </p>
+              <div className="flex flex-col">
+                <p className="text-lg sm:text-2xl font-bold gradient-text animate-pulse">
+                  {totalGift.toFixed(3)}
+                </p>
+                <p className="text-xs text-gray-400">
+                  {isSubscribed ? 'x1.5 бонус активен' : ''}
+                </p>
+              </div>
             </div>
             <div className="glass-panel p-2 sm:p-4 text-center hover-scale">
               <p className="text-xs sm:text-sm text-gray-400 mb-0.5 sm:mb-1">Всего NFT</p>

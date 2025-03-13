@@ -4,13 +4,16 @@ import SubscriptionService from './subscription';
 
 class NFTService {
   private farmingState: { [key: string]: { isStaking: boolean; startTime: number } } = {};
+  private giftBalance: number = 0;
   private apiEndpoint: string;
   private apiKey: string;
+  private giftBalanceKey = 'gift_balance';
 
   constructor() {
     this.apiEndpoint = import.meta.env.VITE_TON_ENDPOINT;
     this.apiKey = import.meta.env.VITE_TON_API_KEY;
     this.loadFarmingState();
+    this.loadGiftBalance();
   }
 
   private loadFarmingState() {
@@ -22,6 +25,68 @@ class NFTService {
 
   private saveFarmingState() {
     localStorage.setItem('farmingState', JSON.stringify(this.farmingState));
+  }
+
+  private loadGiftBalance() {
+    const savedBalance = localStorage.getItem(this.giftBalanceKey);
+    if (savedBalance) {
+      this.giftBalance = parseFloat(savedBalance);
+    }
+  }
+
+  private saveGiftBalance() {
+    localStorage.setItem(this.giftBalanceKey, this.giftBalance.toString());
+  }
+
+  // Получить баланс GIFT
+  getGiftBalance(): number {
+    return this.giftBalance;
+  }
+
+  // Добавить GIFT к балансу
+  private addToBalance(amount: number) {
+    this.giftBalance += amount;
+    this.saveGiftBalance();
+  }
+
+  // Проверить, можно ли собрать награду
+  canCollectReward(nftAddress: string): boolean {
+    const farmingData = this.farmingState[nftAddress];
+    if (!farmingData || !farmingData.isStaking) return false;
+
+    const now = Date.now();
+    const elapsedHours = (now - farmingData.startTime) / (1000 * 60 * 60);
+    return elapsedHours >= 12; // Можно собрать только после 12 часов
+  }
+
+  // Собрать награду с NFT
+  async collectReward(nftAddress: string): Promise<number> {
+    const farmingData = this.farmingState[nftAddress];
+    if (!farmingData || !farmingData.isStaking) return 0;
+
+    const reward = this.calculateAccumulatedGift(nftAddress);
+    if (reward > 0) {
+      this.addToBalance(reward);
+      delete this.farmingState[nftAddress];
+      this.saveFarmingState();
+    }
+
+    return reward;
+  }
+
+  // Собрать награды со всех NFT
+  async collectAllRewards(nfts: NFT[]): Promise<number> {
+    let totalRewards = 0;
+    const readyToCollect = nfts.filter(nft => this.canCollectReward(nft.address));
+    
+    if (readyToCollect.length === 0) return 0;
+
+    for (const nft of readyToCollect) {
+      const reward = await this.collectReward(nft.address);
+      totalRewards += reward;
+    }
+
+    return totalRewards;
   }
 
   // Форматируем адрес в правильный формат
@@ -162,18 +227,6 @@ class NFTService {
     this.saveFarmingState();
   }
 
-  // Собрать награду с NFT
-  async collectReward(nftAddress: string): Promise<number> {
-    const farmingData = this.farmingState[nftAddress];
-    if (!farmingData || !farmingData.isStaking) return 0;
-
-    const reward = this.calculateAccumulatedGift(nftAddress);
-    delete this.farmingState[nftAddress];
-    this.saveFarmingState();
-
-    return reward;
-  }
-
   // Получить накопленные GIFT токены для NFT
   async getAccumulatedGift(nftAddress: string): Promise<number> {
     return this.calculateAccumulatedGift(nftAddress);
@@ -208,18 +261,6 @@ class NFTService {
         await this.startFarming(nft.address);
       }
     }
-  }
-
-  // Собрать награды со всех NFT
-  async collectAllRewards(nfts: NFT[]): Promise<number> {
-    let totalRewards = 0;
-    for (const nft of nfts) {
-      if (this.farmingState[nft.address]?.isStaking) {
-        const reward = await this.collectReward(nft.address);
-        totalRewards += reward;
-      }
-    }
-    return totalRewards;
   }
 }
 
