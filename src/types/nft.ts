@@ -1,24 +1,22 @@
 export interface NFTCollection {
   address: string;
   name: string;
-  description?: string;
+}
+
+export interface NFTMetadata {
+  name: string;
+  description: string;
+  image: string;
+  attributes: any[];
 }
 
 export interface NFT {
   address: string;
   collectionAddress: string;
-  metadata: {
-    name: string;
-    description?: string;
-    image: string;
-    attributes?: Array<{
-      trait_type: string;
-      value: string | number;
-    }>;
-  };
+  metadata: NFTMetadata;
   isStaking: boolean;
   stakingStartTime?: number;
-  accumulatedGift?: number;
+  accumulatedGift: number;
 }
 
 // Список поддерживаемых коллекций
