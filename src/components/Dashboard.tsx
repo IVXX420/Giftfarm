@@ -191,13 +191,7 @@ const Dashboard: React.FC = () => {
         {/* Верхняя панель */}
         <div className="glass-panel p-4 sm:p-6 mb-4 sm:mb-8 hover-scale">
           <div className="flex flex-col sm:flex-row items-center justify-between mb-4 sm:mb-6 space-y-4 sm:space-y-0">
-            <div className="flex items-center">
-              <img src="/gift-logo.png" alt="GIFT Farm" className="h-8 w-8 sm:h-12 sm:w-12 mr-3 sm:mr-4" />
-              <h1 className="text-2xl sm:text-3xl font-bold gradient-text">
-                GIFT Farm
-              </h1>
-            </div>
-            <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-4">
+            <div className="flex items-center space-x-4">
               <div className="text-center sm:text-right">
                 <p className="text-xs sm:text-sm text-gray-400 mb-1">Ваш адрес</p>
                 <div className="glass-panel px-3 py-1.5">
