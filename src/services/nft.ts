@@ -12,17 +12,12 @@ interface FarmingState {
 
 class NFTService {
   private farmingState: FarmingState = {};
-  private tonClient: TonClient;
   private apiEndpoint: string;
   private apiKey: string;
 
   constructor() {
     this.apiEndpoint = import.meta.env.VITE_TON_ENDPOINT;
     this.apiKey = import.meta.env.VITE_TON_API_KEY;
-    this.tonClient = new TonClient({
-      endpoint: this.apiEndpoint,
-      apiKey: this.apiKey,
-    });
     this.loadFarmingState();
   }
 
