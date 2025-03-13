@@ -1,5 +1,4 @@
 import PaymentService from './payment';
-import { useTonConnectUI } from '@tonconnect/ui-react';
 
 class SubscriptionService {
   private static FARMING_MULTIPLIER = 1.5;

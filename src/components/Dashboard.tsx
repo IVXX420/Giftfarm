@@ -66,8 +66,9 @@ const Dashboard: React.FC = () => {
   // Подписка на премиум
   const handleSubscribe = async () => {
     try {
-      await SubscriptionService.subscribe();
-      setIsSubscribed(SubscriptionService.isSubscribed());
+      await SubscriptionService.subscribe(tonConnectUI);
+      // Обновляем UI после успешной оплаты
+      window.location.reload();
     } catch (error) {
       console.error('Ошибка при оформлении подписки:', error);
     }

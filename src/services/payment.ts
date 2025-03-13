@@ -1,10 +1,11 @@
-import { useTonConnectUI } from '@tonconnect/ui-react';
 import { Address, toNano } from '@ton/core';
 
 class PaymentService {
   private static SUBSCRIPTION_PRICE = 10; // 10 TON за подписку
   private static SUBSCRIPTION_DURATION = 30 * 24 * 60 * 60 * 1000; // 30 дней в миллисекундах
   private static OWNER_ADDRESS = 'EQDrjaLahLkMB-hMCmkzOyBuHJ139ZUYmPHu6RRBKnbdLIYI'; // Адрес владельца для получения платежей
+  private static apiEndpoint = 'https://api.ton.dev'; // Замените на реальный API-конечный путь
+  private static apiKey = 'your-api-key'; // Замените на реальный API-ключ
 
   // Создаем транзакцию для оплаты подписки
   static async createSubscriptionPayment() {
@@ -58,9 +59,22 @@ class PaymentService {
   // Проверяем статус транзакции
   static async checkTransactionStatus(transactionHash: string): Promise<boolean> {
     try {
-      // Здесь можно добавить проверку статуса транзакции через TON API
-      // Для демо версии просто возвращаем true
-      return true;
+      // Здесь будет реальная проверка транзакции через TON API
+      console.log('Проверка транзакции:', transactionHash);
+      const response = await fetch(`${this.apiEndpoint}/transactions/${transactionHash}`, {
+        headers: {
+          'Authorization': `Bearer ${this.apiKey}`,
+          'Accept': 'application/json',
+        }
+      });
+
+      if (!response.ok) {
+        console.error('Ошибка при проверке транзакции:', await response.text());
+        return false;
+      }
+
+      const data = await response.json();
+      return data.status === 'completed';
     } catch (error) {
       console.error('Ошибка при проверке транзакции:', error);
       return false;
