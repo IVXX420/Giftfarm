@@ -49,9 +49,11 @@ const WalletConnect: React.FC = () => {
       setIsLoading(true);
       setError(null);
       
-      // Проверяем, установлен ли TON Keeper
-      if (!window.tonkeeper) {
-        throw new Error('TON Keeper не установлен. Пожалуйста, установите TON Keeper для продолжения.');
+      // Проверяем, не подключен ли уже кошелек
+      if (tonConnectUI.connected) {
+        console.log('Кошелек уже подключен');
+        setIsLoading(false);
+        return;
       }
 
       // Подключаем кошелек через TON Connect
