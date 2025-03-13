@@ -2,195 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@import './styles/animations.css';
-
-:root {
-  --primary: #3B82F6;
-  --primary-dark: #0EA5E9;
-  --background: #0F172A;
-  --background-light: #1E293B;
-  --text: #F8FAFC;
-  --text-secondary: #94A3B8;
-}
-
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  background: var(--background);
-  color: var(--text);
-  min-height: 100vh;
-}
-
-/* Стили для скроллбара */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--background-light);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--primary);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--primary-dark);
-}
-
-/* Базовые стили для кнопок */
-.button-base {
-  @apply relative overflow-hidden rounded-lg px-4 py-2 font-medium text-white transition-all duration-300;
-  background: linear-gradient(45deg, var(--primary), var(--primary-dark));
-  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
-}
-
-.button-base:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
-}
-
-.button-base:active {
-  transform: translateY(0);
-}
-
-.button-base::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.2),
-    transparent
-  );
-  transition: 0.5s;
-}
-
-.button-base:hover::before {
-  left: 100%;
-}
-
-/* Стили для карточек */
-.glass-panel {
-  @apply rounded-xl p-4;
-  background: rgba(15, 23, 42, 0.7);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(59, 130, 246, 0.2);
-  transition: all 0.3s ease;
-}
-
-.glass-panel:hover {
-  background: rgba(15, 23, 42, 0.8);
-  border-color: rgba(59, 130, 246, 0.4);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.2);
-}
-
-/* Стили для инпутов */
-.input-base {
-  @apply w-full rounded-lg bg-white/5 px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500;
-  border: 1px solid rgba(59, 130, 246, 0.2);
-  transition: all 0.3s ease;
-}
-
-.input-base:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
-}
-
-/* Стили для табов */
-.tab-base {
-  @apply rounded-lg px-4 py-2 font-medium transition-all duration-300;
-  background: rgba(15, 23, 42, 0.7);
-  border: 1px solid rgba(59, 130, 246, 0.2);
-}
-
-.tab-base:hover {
-  background: rgba(15, 23, 42, 0.8);
-  border-color: rgba(59, 130, 246, 0.4);
-}
-
-.tab-base.active {
-  background: linear-gradient(45deg, var(--primary), var(--primary-dark));
-  border-color: transparent;
-  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
-}
-
-/* Стили для прогресс-бара */
-.progress-bar {
-  @apply h-1.5 rounded-full bg-gray-700/50;
-  overflow: hidden;
-}
-
-.progress-bar-fill {
-  @apply h-full rounded-full;
-  background: linear-gradient(90deg, var(--primary), var(--primary-dark));
-  transition: width 0.3s ease;
-}
-
-/* Стили для иконок */
-.icon-base {
-  @apply text-gray-400 transition-colors duration-300;
-}
-
-.icon-base:hover {
-  @apply text-blue-400;
-}
-
-/* Стили для заголовков */
-.heading-base {
-  @apply text-2xl font-bold;
-  background: linear-gradient(45deg, var(--primary), var(--primary-dark));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-/* Стили для ссылок */
-.link-base {
-  @apply text-blue-400 transition-colors duration-300 hover:text-blue-300;
-  text-decoration: none;
-}
-
-/* Стили для бейджей */
-.badge-base {
-  @apply rounded-full px-2 py-1 text-xs font-medium;
-  background: rgba(59, 130, 246, 0.1);
-  color: var(--primary);
-}
-
-/* Стили для уведомлений */
-.toast-base {
-  @apply rounded-lg bg-white/10 p-4 text-white;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(59, 130, 246, 0.2);
-}
-
-/* Стили для модальных окон */
-.modal-base {
-  @apply fixed inset-0 z-50 flex items-center justify-center;
-  background: rgba(15, 23, 42, 0.8);
-  backdrop-filter: blur(5px);
-}
-
-.modal-content {
-  @apply rounded-xl bg-white/10 p-6;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(59, 130, 246, 0.2);
-  animation: scaleIn 0.3s ease-out;
-}
-
 @layer base {
   :root {
     font-family: 'Inter', system-ui, sans-serif;
@@ -212,6 +23,21 @@ body {
 
   .gradient-text {
     @apply bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600 bg-clip-text text-transparent;
+  }
+
+  .button-base {
+    @apply bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg 
+           transition-all duration-300 
+           hover:from-blue-600 hover:to-blue-700
+           disabled:from-gray-600 disabled:to-gray-700 disabled:cursor-not-allowed
+           shadow-sm hover:shadow-md transform hover:-translate-y-0.5 
+           disabled:hover:translate-y-0 disabled:hover:shadow-sm 
+           border border-blue-400/20 hover:border-blue-400/40;
+  }
+
+  .glass-panel {
+    @apply bg-black/30 rounded-xl shadow-xl border border-white/10;
+    backdrop-filter: blur(8px);
   }
 
   .hover-scale {

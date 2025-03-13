@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTonConnect } from '../hooks/useTonConnect';
 import { useTonConnectUI } from '@tonconnect/ui-react';
 import NFTService from '../services/nft';
@@ -8,22 +9,17 @@ import NFTCard from './NFTCard';
 import SubscriptionPanel from './SubscriptionPanel';
 import StatsPanel from './StatsPanel';
 import Logo from './Logo';
-import Header from './Header';
-import { toast } from 'react-toastify';
 
 const Dashboard: React.FC = () => {
+  const navigate = useNavigate();
   const { connected, wallet } = useTonConnect();
   const [tonConnectUI] = useTonConnectUI();
   const [nfts, setNfts] = useState<NFT[]>([]);
   const [totalGift, setTotalGift] = useState<number>(0);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [selectedTab, setSelectedTab] = useState<'all' | 'farming'>('all');
   const [isConnecting, setIsConnecting] = useState<boolean>(false);
   const [isSubscribed, setIsSubscribed] = useState<boolean>(false);
-  const [isTelegramWebView] = useState(() => {
-    const w = window as Window & typeof globalThis & { Telegram?: { WebApp: any } };
-    return w.Telegram?.WebApp !== undefined;
-  });
 
   // Загрузка NFT
   const loadNFTs = async () => {
@@ -37,11 +33,6 @@ const Dashboard: React.FC = () => {
       setNfts(userNFTs);
     } catch (error) {
       console.error('Ошибка при загрузке NFT:', error);
-      toast.error('Ошибка при загрузке NFT 😢', {
-        className: 'toast-base animate-fade-in-up',
-        position: 'top-right',
-        autoClose: 3000
-      });
     } finally {
       setIsLoading(false);
     }
@@ -53,7 +44,7 @@ const Dashboard: React.FC = () => {
     try {
       // Получаем накопленные GIFT с активных фармов
       const farmingTotal = await Promise.all(
-        nfts.map(nft => NFTService.getAccumulatedGift(nft.id))
+        nfts.map(nft => NFTService.getAccumulatedGift(nft.address))
       );
       // Получаем общий баланс GIFT
       const totalBalance = NFTService.getGiftBalance() + farmingTotal.reduce((sum, amount) => sum + amount, 0);
@@ -67,7 +58,7 @@ const Dashboard: React.FC = () => {
   const updateNFTState = (nftAddress: string, isStaking: boolean) => {
     setNfts(prevNfts => 
       prevNfts.map(nft => 
-        nft.id === nftAddress 
+        nft.address === nftAddress 
           ? { ...nft, isStaking, stakingStartTime: isStaking ? Date.now() : 0 }
           : nft
       )
@@ -92,7 +83,7 @@ const Dashboard: React.FC = () => {
       // Обновляем только те NFT, которые не были в процессе фарминга
       setNfts(prevNfts => 
         prevNfts.map(nft => {
-          const farmingData = NFTService.getFarmingState(nft.id);
+          const farmingData = NFTService.getFarmingState(nft.address);
           return farmingData?.isStaking
             ? { ...nft, isStaking: true, stakingStartTime: farmingData.startTime }
             : nft;
@@ -112,7 +103,7 @@ const Dashboard: React.FC = () => {
         // Обновляем только те NFT, с которых собрали награду
         setNfts(prevNfts => 
           prevNfts.map(nft => {
-            const farmingData = NFTService.getFarmingState(nft.id);
+            const farmingData = NFTService.getFarmingState(nft.address);
             return !farmingData?.isStaking
               ? { ...nft, isStaking: false, stakingStartTime: 0 }
               : nft;
@@ -151,71 +142,32 @@ const Dashboard: React.FC = () => {
     try {
       setIsConnecting(true);
       await tonConnectUI.connectWallet();
-      // Убираем навигацию, так как она может вызывать проблемы в Telegram WebView
-      // navigate('/dashboard');
+      navigate('/dashboard');
     } catch (error) {
       console.error('Ошибка подключения:', error);
-      toast.error('Ошибка при подключении кошелька 😢', {
-        className: 'toast-base animate-fade-in-up',
-        position: 'top-right',
-        autoClose: 3000
-      });
     } finally {
       setIsConnecting(false);
     }
   };
 
-  const handleDisconnect = async () => {
-    try {
-      await tonConnectUI.disconnect();
-      toast.success('Кошелек успешно отключен 👋', {
-        className: 'toast-base animate-fade-in-up',
-        position: 'top-right',
-        autoClose: 3000
-      });
-    } catch (error) {
-      toast.error('Ошибка при отключении кошелька 😢', {
-        className: 'toast-base animate-fade-in-up',
-        position: 'top-right',
-        autoClose: 3000
-      });
-    }
-  };
-
-  useEffect(() => {
-    // Настраиваем Telegram WebApp если приложение открыто в Telegram
-    if (isTelegramWebView) {
-      const w = window as Window & typeof globalThis & { Telegram?: { WebApp: any } };
-      const tg = w.Telegram?.WebApp;
-      if (tg) {
-        tg.ready();
-        tg.expand();
-        
-        // Устанавливаем цвета для WebApp
-        tg.setHeaderColor('#1a1b1e');
-        tg.setBackgroundColor('#0f1114');
-      }
-    }
-  }, [isTelegramWebView]);
-
   if (!connected) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 animate-gradient">
-        <div className="glass-panel p-8 max-w-md w-full hover-scale">
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="backdrop-blur-lg bg-white/5 p-8 rounded-2xl border border-white/10 shadow-xl hover:shadow-2xl transition-all duration-300 max-w-md w-full transform hover:scale-[1.02]">
           <div className="flex justify-center mb-8">
             <Logo />
           </div>
-          <h1 className="text-4xl font-bold mb-6 text-center gradient-text">
+          <h1 className="text-4xl font-bold mb-6 text-center bg-gradient-to-r from-blue-400 to-purple-500 text-transparent bg-clip-text">
             GIFT Farm
           </h1>
-          <p className="text-gray-300 text-center text-lg mb-8 animate-fadeIn delay-200">
+          <p className="text-gray-300 text-center text-lg mb-8 animate-fade-in">
             Подключите TON Keeper для доступа к фармингу
           </p>
           <div className="flex justify-center">
             <button 
               onClick={handleConnect}
               disabled={isConnecting}
-              className="button-base py-3 px-6 text-lg font-medium w-full max-w-xs hover:shadow-glow"
+              className="bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 px-6 rounded-xl font-medium w-full max-w-xs hover:shadow-lg hover:shadow-blue-500/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isConnecting ? 'Подключение...' : 'Подключить кошелёк'}
             </button>
@@ -226,45 +178,47 @@ const Dashboard: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen animate-gradient py-4 sm:py-8">
+    <div className="min-h-screen py-4 sm:py-8">
       <div className="container mx-auto px-2 sm:px-4 max-w-4xl">
-        <Header onDisconnect={handleDisconnect} />
-
         {/* Информационная панель */}
-        <StatsPanel
-          totalGift={totalGift}
-          totalNFTs={nfts.length}
-          farmingNFTs={farmingNFTs.length}
-          isSubscribed={isSubscribed}
-        />
+        <div className="backdrop-blur-lg bg-white/5 rounded-2xl border border-white/10 p-6 mb-6 shadow-xl">
+          <StatsPanel
+            totalGift={totalGift}
+            totalNFTs={nfts.length}
+            farmingNFTs={farmingNFTs.length}
+            isSubscribed={isSubscribed}
+          />
+        </div>
 
         {/* Панель подписки */}
-        <SubscriptionPanel
-          isSubscribed={isSubscribed}
-          onSubscribe={handleSubscribe}
-          onStartAllFarming={handleStartAllFarming}
-          onCollectAllRewards={handleCollectAllRewards}
-          farmingCount={farmingNFTs.length}
-          totalNFTs={nfts.length}
-        />
+        <div className="backdrop-blur-lg bg-white/5 rounded-2xl border border-white/10 p-6 mb-6 shadow-xl">
+          <SubscriptionPanel
+            isSubscribed={isSubscribed}
+            onSubscribe={handleSubscribe}
+            onStartAllFarming={handleStartAllFarming}
+            onCollectAllRewards={handleCollectAllRewards}
+            farmingCount={farmingNFTs.length}
+            totalNFTs={nfts.length}
+          />
+        </div>
 
         {/* Табы */}
-        <div className="flex space-x-2 sm:space-x-4 mb-4 sm:mb-6">
+        <div className="flex space-x-2 sm:space-x-4 mb-6">
           <button 
-            className={`px-3 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-all duration-300 hover-scale text-sm sm:text-base ${
+            className={`px-4 py-2 rounded-xl font-medium transition-all duration-300 transform hover:scale-105 ${
               selectedTab === 'all' 
-                ? 'bg-blue-600 text-white shadow-glow' 
-                : 'glass-panel text-gray-400 hover:text-white'
+                ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/30' 
+                : 'bg-white/5 text-gray-400 hover:text-white border border-white/10'
             }`}
             onClick={() => setSelectedTab('all')}
           >
             Все NFT ({nfts.length})
           </button>
           <button 
-            className={`px-3 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-all duration-300 hover-scale text-sm sm:text-base ${
+            className={`px-4 py-2 rounded-xl font-medium transition-all duration-300 transform hover:scale-105 ${
               selectedTab === 'farming' 
-                ? 'bg-blue-600 text-white shadow-glow' 
-                : 'glass-panel text-gray-400 hover:text-white'
+                ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/30' 
+                : 'bg-white/5 text-gray-400 hover:text-white border border-white/10'
             }`}
             onClick={() => setSelectedTab('farming')}
           >
@@ -274,58 +228,42 @@ const Dashboard: React.FC = () => {
 
         {/* Загрузка */}
         {isLoading && (
-          <div className="glass-panel p-6 sm:p-12 text-center animate-fadeIn">
-            <div className="inline-block animate-bounce-sm">
-              <svg className="animate-spin h-12 w-12 sm:h-16 sm:w-16 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <div className="backdrop-blur-lg bg-white/5 rounded-2xl border border-white/10 p-8 text-center animate-fade-in">
+            <div className="inline-block animate-bounce">
+              <svg className="animate-spin h-16 w-16 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
             </div>
-            <p className="text-gray-300 mt-4 sm:mt-6 text-base sm:text-lg animate-pulse">Загрузка NFT...</p>
+            <p className="text-gray-300 mt-6 text-lg animate-pulse">Загрузка NFT...</p>
           </div>
         )}
 
         {/* Пустое состояние */}
         {!isLoading && nfts.length === 0 && (
-          <div className="glass-panel p-6 sm:p-12 text-center animate-fadeIn">
-            <svg className="mx-auto h-16 w-16 sm:h-24 sm:w-24 text-gray-600 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="backdrop-blur-lg bg-white/5 rounded-2xl border border-white/10 p-8 text-center animate-fade-in">
+            <svg className="mx-auto h-24 w-24 text-gray-600 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
             </svg>
-            <p className="text-gray-300 mt-4 sm:mt-6 text-lg sm:text-xl">
+            <p className="text-gray-300 mt-6 text-xl">
               У вас нет NFT, подходящих для фарминга
             </p>
-            <p className="text-gray-500 mt-2 text-sm sm:text-base">
+            <p className="text-gray-500 mt-2 text-base">
               Приобретите NFT из поддерживаемых коллекций
             </p>
           </div>
         )}
 
-        {/* Список NFT */}
+        {/* Сетка NFT */}
         {!isLoading && nfts.length > 0 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
-            {(selectedTab === 'all' ? nfts : farmingNFTs).map((nft, index) => (
-              <div key={nft.id} 
-                className="animate-fadeIn" 
-                style={{ animationDelay: `${index * 100}ms` }}
-              >
-                <NFTCard 
-                  name={nft.name}
-                  image={nft.image}
-                  collection={nft.collection}
-                  isFarming={nft.isStaking}
-                  farmingEndTime={nft.stakingStartTime ? nft.stakingStartTime + 12 * 60 * 60 * 1000 : undefined}
-                  onStartFarming={async () => {
-                    await NFTService.startFarming(nft.id);
-                    updateNFTState(nft.id, true);
-                    updateTotalGift();
-                  }}
-                  onCollectReward={async () => {
-                    await NFTService.collectReward(nft.id);
-                    updateNFTState(nft.id, false);
-                    updateTotalGift();
-                  }}
-                />
-              </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            {(selectedTab === 'all' ? nfts : farmingNFTs).map((nft) => (
+              <NFTCard
+                key={nft.address}
+                nft={nft}
+                onStartFarming={() => updateNFTState(nft.address, true)}
+                onCollectRewards={() => updateNFTState(nft.address, false)}
+              />
             ))}
           </div>
         )}

@@ -79,7 +79,7 @@ class NFTService {
     let totalRewards = 0;
     // Фильтруем только те NFT, с которых можно собрать награду
     const readyToCollect = nfts.filter(nft => {
-      const farmingData = this.farmingState[nft.id];
+      const farmingData = this.farmingState[nft.address];
       if (!farmingData?.isStaking) return false;
       
       const now = Date.now();
@@ -90,7 +90,7 @@ class NFTService {
     if (readyToCollect.length === 0) return 0;
 
     for (const nft of readyToCollect) {
-      const reward = await this.collectReward(nft.id);
+      const reward = await this.collectReward(nft.address);
       totalRewards += reward;
     }
 
@@ -180,13 +180,13 @@ class NFTService {
     return nfts.filter(nft => {
       const collectionAddress = nft.collection?.address;
       console.log('Проверяем NFT:', {
-        address: nft.id,
+        address: nft.address,
         collectionAddress: collectionAddress,
         metadata: nft.metadata
       });
       
       if (!collectionAddress) {
-        console.log(`NFT ${nft.id} не имеет адреса коллекции`);
+        console.log(`NFT ${nft.address} не имеет адреса коллекции`);
         return false;
       }
 
@@ -200,22 +200,30 @@ class NFTService {
         return matches;
       });
       
-      console.log(`NFT ${nft.id} из коллекции ${formattedCollectionAddress} поддерживается: ${isSupported}`);
+      console.log(`NFT ${nft.address} из коллекции ${formattedCollectionAddress} поддерживается: ${isSupported}`);
       return isSupported;
     });
   }
 
   // Обогащаем NFT метаданными
   private async enrichNFTsWithMetadata(nfts: any[]): Promise<NFT[]> {
-    return Promise.all(nfts.map(async (nft) => ({
-      id: nft.id,
-      name: nft.metadata.name,
-      image: nft.metadata.image,
-      collection: nft.collectionAddress,
-      isStaking: nft.isStaking,
-      stakingStartTime: nft.stakingStartTime,
-      accumulatedGift: nft.accumulatedGift
-    })));
+    return Promise.all(nfts.map(async (nft) => {
+      const farmingData = this.farmingState[nft.address] || { isStaking: false, startTime: 0 };
+      
+      return {
+        address: nft.address,
+        collectionAddress: nft.collection?.address,
+        metadata: {
+          name: nft.metadata?.name || nft.dns || 'Unnamed NFT',
+          description: nft.metadata?.description || '',
+          image: nft.metadata?.image || nft.previews?.[0]?.url || '',
+          attributes: nft.metadata?.attributes || [],
+        },
+        isStaking: farmingData.isStaking,
+        stakingStartTime: farmingData.startTime,
+        accumulatedGift: this.calculateAccumulatedGift(nft.address)
+      };
+    }));
   }
 
   // Начать фарминг для NFT
@@ -258,14 +266,14 @@ class NFTService {
   async startAllFarming(nfts: NFT[]): Promise<void> {
     // Фильтруем только те NFT, которые не находятся в процессе фарминга
     const availableForFarming = nfts.filter(nft => {
-      const farmingData = this.farmingState[nft.id];
+      const farmingData = this.farmingState[nft.address];
       return !farmingData?.isStaking;
     });
 
     if (availableForFarming.length === 0) return;
 
     for (const nft of availableForFarming) {
-      await this.startFarming(nft.id);
+      await this.startFarming(nft.address);
     }
   }
 
