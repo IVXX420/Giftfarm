@@ -31,6 +31,15 @@ const ErrorMessage = styled.div`
   border-radius: var(--border-radius);
 `;
 
+const InfoMessage = styled.div`
+  color: var(--tg-theme-text-color);
+  text-align: center;
+  margin: 10px 0;
+  padding: 10px;
+  background-color: var(--tg-theme-secondary-bg-color, #f0f0f0);
+  border-radius: var(--border-radius);
+`;
+
 const WalletConnect: React.FC = () => {
   const [tonConnectUI] = useTonConnectUI();
   const [error, setError] = React.useState<string | null>(null);
@@ -43,6 +52,11 @@ const WalletConnect: React.FC = () => {
         await tonConnectUI.connectionRestored;
         
         if (tonConnectUI.connected) {
+          console.log('Wallet connected:', {
+            address: tonConnectUI.account?.address,
+            chain: tonConnectUI.account?.chain,
+            wallet: tonConnectUI.wallet,
+          });
           navigate('/dashboard');
         }
       } catch (err) {
@@ -61,11 +75,21 @@ const WalletConnect: React.FC = () => {
       setError(null);
 
       if (tonConnectUI.connected) {
+        console.log('Already connected:', {
+          address: tonConnectUI.account?.address,
+          chain: tonConnectUI.account?.chain,
+          wallet: tonConnectUI.wallet,
+        });
         navigate('/dashboard');
         return;
       }
 
       await tonConnectUI.connectWallet();
+      console.log('New connection:', {
+        address: tonConnectUI.account?.address,
+        chain: tonConnectUI.account?.chain,
+        wallet: tonConnectUI.wallet,
+      });
       navigate('/dashboard');
     } catch (err) {
       console.error('Ошибка подключения кошелька:', err);
@@ -81,6 +105,9 @@ const WalletConnect: React.FC = () => {
 
   return (
     <div>
+      <InfoMessage>
+        Для использования приложения подключите кошелек TON Keeper (mainnet)
+      </InfoMessage>
       {error && <ErrorMessage>{error}</ErrorMessage>}
       <ConnectButton onClick={handleConnect} disabled={isLoading}>
         {isLoading ? 'Подключение...' : 'Подключить TON Keeper'}
