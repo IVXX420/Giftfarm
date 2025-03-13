@@ -1,4 +1,4 @@
-import { Address, toNano } from '@ton/core';
+import { toNano } from '@ton/core';
 
 class PaymentService {
   private static SUBSCRIPTION_PRICE = 1; // 1 TON за подписку
