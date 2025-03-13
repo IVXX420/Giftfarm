@@ -60,8 +60,8 @@ const Dashboard: React.FC = () => {
   if (!connected) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gradient-to-b from-gray-900 to-black animate-gradient">
-        <div className="bg-gray-800/50 backdrop-blur-lg rounded-2xl shadow-xl p-8 max-w-md w-full transform transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl border border-gray-700/50 animate-fadeIn">
-          <h1 className="text-3xl font-bold mb-6 text-center bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600 bg-clip-text text-transparent animate-pulse">
+        <div className="card-base p-8 max-w-md w-full hover:scale-[1.02] hover:shadow-2xl animate-fadeIn">
+          <h1 className="text-3xl font-bold mb-6 text-center gradient-text animate-pulse">
             Подключите кошелёк TON
           </h1>
           <p className="text-gray-300 text-center text-lg animate-fadeIn delay-200">
@@ -76,14 +76,14 @@ const Dashboard: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black animate-gradient">
       <div className="container mx-auto px-4 py-8 max-w-2xl">
         {/* Заголовок и баланс */}
-        <div className="bg-gray-800/50 backdrop-blur-lg rounded-2xl shadow-xl p-6 mb-6 transform transition-all duration-500 hover:shadow-2xl border border-gray-700/50 animate-fadeIn">
-          <h1 className="text-2xl font-bold mb-4 bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600 bg-clip-text text-transparent animate-pulse">
+        <div className="card-base p-6 mb-6 hover:shadow-2xl animate-fadeIn">
+          <h1 className="text-2xl font-bold mb-4 gradient-text animate-pulse">
             Фарминг GIFT
           </h1>
           <div className="flex items-center justify-between">
             <div className="animate-fadeIn delay-100">
               <p className="text-gray-300">Ваш баланс GIFT:</p>
-              <p className="text-3xl font-bold bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600 bg-clip-text text-transparent">
+              <p className="text-3xl font-bold gradient-text">
                 {totalGift.toFixed(3)}
               </p>
             </div>
@@ -112,7 +112,7 @@ const Dashboard: React.FC = () => {
 
         {/* Список NFT */}
         {!isLoading && nfts.length === 0 && (
-          <div className="text-center py-8 bg-gray-800/50 backdrop-blur-lg rounded-2xl shadow-xl p-6 border border-gray-700/50 animate-fadeIn">
+          <div className="card-base text-center py-8 p-6 animate-fadeIn">
             <svg className="mx-auto h-12 w-12 text-gray-400 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
             </svg>
