@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useTonConnect } from '../hooks/useTonConnect';
+import { useTonConnectUI } from '@tonconnect/ui-react';
 import NFTService from '../services/nft';
 import { NFT } from '../types/nft';
 import NFTCard from './NFTCard';
 
 const Dashboard: React.FC = () => {
   const { connected, wallet } = useTonConnect();
+  const [tonConnectUI] = useTonConnectUI();
   const [nfts, setNfts] = useState<NFT[]>([]);
   const [totalGift, setTotalGift] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -78,7 +80,10 @@ const Dashboard: React.FC = () => {
             Подключите TON Keeper для доступа к фармингу
           </p>
           <div className="flex justify-center">
-            <button className="button-base py-3 px-6 text-lg font-medium w-full max-w-xs hover:shadow-glow">
+            <button 
+              onClick={() => tonConnectUI.connectWallet()}
+              className="button-base py-3 px-6 text-lg font-medium w-full max-w-xs hover:shadow-glow"
+            >
               Подключить кошелёк
             </button>
           </div>

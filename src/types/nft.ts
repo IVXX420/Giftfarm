@@ -5,21 +5,14 @@ export interface NFTCollection {
 
 export interface NFTMetadata {
   name: string;
-  description: string;
   image: string;
-  attributes: Array<{
-    trait_type: string;
-    value: string | number;
-  }>;
 }
 
 export interface NFT {
   address: string;
-  collectionAddress: string;
   metadata: NFTMetadata;
   isStaking: boolean;
   stakingStartTime: number;
-  accumulatedGift: number;
 }
 
 // Поддерживаемые коллекции NFT

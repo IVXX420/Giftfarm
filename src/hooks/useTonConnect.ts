@@ -1,25 +1,28 @@
 import { useTonConnectUI } from '@tonconnect/ui-react';
 import { useCallback, useEffect, useState } from 'react';
-import { ConnectedWallet } from '@tonconnect/ui';
 
 export function useTonConnect() {
   const [tonConnectUI] = useTonConnectUI();
-  const [connected, setConnected] = useState(false);
+  const [wallet, setWallet] = useState<{ address: string; chain: string } | null>(null);
 
-  const onStatusChange = useCallback((wallet: ConnectedWallet | null) => {
-    setConnected(!!wallet);
-  }, []);
+  const updateWallet = useCallback(() => {
+    if (tonConnectUI.account) {
+      setWallet({
+        address: tonConnectUI.account.address,
+        chain: tonConnectUI.account.chain,
+      });
+    } else {
+      setWallet(null);
+    }
+  }, [tonConnectUI.account]);
 
   useEffect(() => {
-    tonConnectUI.connectionRestored.then((wallet) => {
-      setConnected(!!wallet);
-    });
-
-    tonConnectUI.onStatusChange(onStatusChange);
-  }, [onStatusChange, tonConnectUI]);
+    updateWallet();
+  }, [updateWallet]);
 
   return {
-    connected,
-    wallet: tonConnectUI.account,
+    connected: tonConnectUI.connected,
+    wallet,
+    tonConnectUI,
   };
 } 
