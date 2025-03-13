@@ -25,7 +25,7 @@ class NFTService {
     try {
       const response = await fetch(url, {
         headers: {
-          'Authorization': this.apiKey,
+          'X-API-Key': this.apiKey,
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
@@ -58,22 +58,24 @@ class NFTService {
   // Получить все NFT пользователя
   async getUserNFTs(userAddress: string): Promise<NFT[]> {
     try {
-      // Убираем префикс "0:" из адреса
-      const formattedAddress = userAddress.replace('0:', '');
+      // Убираем префикс "0:" из адреса и форматируем его
+      const formattedAddress = userAddress.replace('0:', '').toLowerCase();
       console.log('Getting NFTs for address:', formattedAddress);
       console.log('Supported collections:', SUPPORTED_COLLECTIONS);
       
       // Получаем NFT через API
-      const data = await this.makeRequest(`${this.apiEndpoint}/accounts/${formattedAddress}/nfts`);
+      const data = await this.makeRequest(`${this.apiEndpoint}/accounts/${formattedAddress}/nfts?limit=1000&offset=0&indirect_ownership=false`);
       const nfts = data.nfts || [];
       console.log('All NFTs:', nfts);
 
-      // Фильтруем только NFT из поддерживаемых коллекций
+      // Фильтруем только NFT из поддерживаемых коллекций и логируем каждый NFT
       const supportedNFTs = nfts.filter((nft: any) => {
+        console.log('Checking NFT:', nft);
+        const nftCollectionAddress = nft.collection?.address?.toLowerCase();
         const isSupported = SUPPORTED_COLLECTIONS.some(collection => 
-          collection.address === nft.collection?.address
+          collection.address.toLowerCase() === nftCollectionAddress
         );
-        console.log('NFT:', nft.address, 'Collection:', nft.collection?.address, 'Is supported:', isSupported);
+        console.log('NFT:', nft.address, 'Collection:', nftCollectionAddress, 'Is supported:', isSupported);
         return isSupported;
       });
       console.log('Supported NFTs:', supportedNFTs);
@@ -82,14 +84,15 @@ class NFTService {
       const nftsWithMetadata = await Promise.all(
         supportedNFTs.map(async (nft: any) => {
           const farmingData = this.farmingState[nft.address] || { isStaking: false };
+          console.log('Processing NFT metadata:', nft);
           
           return {
             address: nft.address,
             collectionAddress: nft.collection?.address,
             metadata: {
-              name: nft.metadata?.name || 'Unnamed NFT',
+              name: nft.metadata?.name || nft.dns || 'Unnamed NFT',
               description: nft.metadata?.description || '',
-              image: nft.metadata?.image || '',
+              image: nft.metadata?.image || nft.previews?.[0]?.url || '',
               attributes: nft.metadata?.attributes || [],
             },
             isStaking: farmingData.isStaking,
