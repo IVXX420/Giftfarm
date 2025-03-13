@@ -17,7 +17,8 @@
 
 @layer components {
   .card-base {
-    @apply rounded-xl shadow-lg backdrop-blur-sm transition-all duration-300 bg-black/30 hover:shadow-xl;
+    @apply rounded-xl shadow-lg bg-black/30 transition-all duration-300;
+    backdrop-filter: blur(8px);
   }
 
   .gradient-text {
@@ -35,11 +36,32 @@
   }
 
   .glass-panel {
-    @apply bg-black/30 backdrop-blur-sm border border-white/10 rounded-xl shadow-xl;
+    @apply bg-black/30 rounded-xl shadow-xl border border-white/10;
+    backdrop-filter: blur(8px);
   }
 
   .hover-scale {
     @apply transition-transform duration-300 hover:scale-[1.02];
+  }
+
+  .nft-card {
+    @apply relative overflow-hidden rounded-xl border border-white/10;
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(8px);
+  }
+
+  .nft-image {
+    @apply absolute top-0 left-0 w-full h-full object-cover transition-all duration-500;
+  }
+
+  .nft-content {
+    @apply absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent;
+  }
+
+  .stat-panel {
+    @apply p-4 rounded-xl border border-white/10 transition-all duration-300;
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(8px);
   }
 }
 
