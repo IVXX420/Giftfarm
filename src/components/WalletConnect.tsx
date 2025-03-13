@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useTonConnectUI } from '@tonconnect/ui-react';
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
 import { tonConnect } from '../config/ton';
 
 const ConnectButton = styled.button`
@@ -43,29 +44,29 @@ const WalletConnect: React.FC = () => {
   const [tonConnectUI] = useTonConnectUI();
   const [error, setError] = React.useState<string | null>(null);
   const [isLoading, setIsLoading] = React.useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Если кошелек уже подключен, перенаправляем на главную
+    if (tonConnectUI.connected) {
+      navigate('/dashboard');
+    }
+  }, [tonConnectUI.connected, navigate]);
 
   const handleConnect = async () => {
     try {
-      setIsLoading(true);
-      setError(null);
-      
-      // Проверяем, не подключен ли уже кошелек
-      if (tonConnectUI.connected) {
-        console.log('Кошелек уже подключен');
-        setIsLoading(false);
+      // Если уже идет процесс подключения или кошелек подключен, игнорируем
+      if (isLoading || tonConnectUI.connected) {
         return;
       }
 
-      // Подключаем кошелек через TON Connect
+      setIsLoading(true);
+      setError(null);
+
       await tonConnectUI.connectWallet();
       
-      // Получаем информацию о кошельке
-      const account = tonConnectUI.account;
-      if (!account) {
-        throw new Error('Не удалось получить информацию о кошельке');
-      }
-
-      console.log('Кошелек успешно подключен:', account);
+      // После успешного подключения перенаправляем на главную
+      navigate('/dashboard');
     } catch (err) {
       console.error('Ошибка подключения кошелька:', err);
       setError(err instanceof Error ? err.message : 'Не удалось подключить кошелек. Пожалуйста, попробуйте еще раз.');
@@ -76,10 +77,13 @@ const WalletConnect: React.FC = () => {
 
   const handleDisconnect = async () => {
     try {
+      if (isLoading) return;
+      
       setIsLoading(true);
       setError(null);
       await tonConnectUI.disconnect();
-      console.log('Кошелек успешно отключен');
+      // После отключения возвращаемся на страницу подключения
+      navigate('/');
     } catch (err) {
       console.error('Ошибка отключения кошелька:', err);
       setError('Не удалось отключить кошелек. Пожалуйста, попробуйте еще раз.');
@@ -88,23 +92,17 @@ const WalletConnect: React.FC = () => {
     }
   };
 
+  // Если кошелек подключен, не показываем этот компонент
+  if (tonConnectUI.connected) {
+    return null;
+  }
+
   return (
     <div>
       {error && <ErrorMessage>{error}</ErrorMessage>}
-      {!tonConnectUI.connected ? (
-        <ConnectButton onClick={handleConnect} disabled={isLoading}>
-          {isLoading ? 'Подключение...' : 'Подключить TON Keeper'}
-        </ConnectButton>
-      ) : (
-        <>
-          <WalletInfo>
-            Кошелек подключен: {tonConnectUI.account?.address.slice(0, 6)}...{tonConnectUI.account?.address.slice(-4)}
-          </WalletInfo>
-          <ConnectButton onClick={handleDisconnect} disabled={isLoading}>
-            {isLoading ? 'Отключение...' : 'Отключить кошелек'}
-          </ConnectButton>
-        </>
-      )}
+      <ConnectButton onClick={handleConnect} disabled={isLoading}>
+        {isLoading ? 'Подключение...' : 'Подключить TON Keeper'}
+      </ConnectButton>
     </div>
   );
 };
