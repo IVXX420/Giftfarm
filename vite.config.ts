@@ -36,6 +36,19 @@ export default defineConfig({
   server: {
     port: 3000,
     host: true,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
+        secure: false,
+      },
+      '/ton': {
+        target: 'https://toncenter.com',
+        changeOrigin: true,
+        secure: true,
+        rewrite: (path) => path.replace(/^\/ton/, '')
+      }
+    }
   },
   preview: {
     port: 3000,
