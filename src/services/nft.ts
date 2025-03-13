@@ -1,4 +1,5 @@
 import { SUPPORTED_COLLECTIONS, NFT } from '../types/nft';
+import { Address } from '@ton/core';
 
 class NFTService {
   private farmingState: { [key: string]: { isStaking: boolean; startTime: number } } = {};
@@ -22,13 +23,27 @@ class NFTService {
     localStorage.setItem('farmingState', JSON.stringify(this.farmingState));
   }
 
+  // Форматируем адрес в правильный формат
+  private formatAddress(address: string): string {
+    try {
+      // Преобразуем адрес в объект Address из @ton/core
+      const formattedAddress = Address.parse(address);
+      // Получаем адрес в формате без bounce
+      return formattedAddress.toString();
+    } catch (error) {
+      console.error('Ошибка при форматировании адреса:', error);
+      return address;
+    }
+  }
+
   // Получить все NFT пользователя
   async getUserNFTs(userAddress: string): Promise<NFT[]> {
     try {
-      console.log('Получаем NFT для адреса:', userAddress);
+      const formattedAddress = this.formatAddress(userAddress);
+      console.log('Получаем NFT для адреса:', formattedAddress);
       
       // Получаем список всех NFT на кошельке
-      const allNFTs = await this.fetchAccountNFTs(userAddress);
+      const allNFTs = await this.fetchAccountNFTs(formattedAddress);
       console.log('Все NFT на кошельке:', allNFTs);
 
       // Фильтруем NFT из поддерживаемых коллекций
