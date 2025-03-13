@@ -1,9 +1,9 @@
 import { Address, toNano } from '@ton/core';
 
 class PaymentService {
-  private static SUBSCRIPTION_PRICE = 10; // 10 TON за подписку
+  private static SUBSCRIPTION_PRICE = 1; // 1 TON за подписку
   private static SUBSCRIPTION_DURATION = 30 * 24 * 60 * 60 * 1000; // 30 дней в миллисекундах
-  private static OWNER_ADDRESS = 'EQDrjaLahLkMB-hMCmkzOyBuHJ139ZUYmPHu6RRBKnbdLIYI'; // Адрес владельца для получения платежей
+  private static OWNER_ADDRESS = 'UQAHmegvebyyP9bVXc-H1unVw9UrUZyPD15jB6PfYVM-ZcvJ'; // Адрес владельца для получения платежей
   private static apiEndpoint = 'https://api.ton.dev'; // Замените на реальный API-конечный путь
   private static apiKey = 'your-api-key'; // Замените на реальный API-ключ
 
@@ -15,13 +15,15 @@ class PaymentService {
         validUntil: Math.floor(Date.now() / 1000) + 300, // 5 минут на оплату
         messages: [
           {
-            address: Address.parse(this.OWNER_ADDRESS).toString(),
-            amount: toNano(this.SUBSCRIPTION_PRICE.toString()).toString(),
-            payload: 'Subscription payment', // Можно добавить дополнительные данные
+            address: this.OWNER_ADDRESS,
+            amount: toNano(this.SUBSCRIPTION_PRICE.toString()),
+            stateInit: null,
+            payload: ''
           },
         ],
       };
 
+      console.log('Создана транзакция:', transaction);
       return transaction;
     } catch (error) {
       console.error('Ошибка при создании платежа:', error);

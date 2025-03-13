@@ -68,7 +68,7 @@ const SubscriptionPanel: React.FC<SubscriptionPanelProps> = ({
             disabled={isProcessing}
             className="button-base py-2 px-4 sm:px-6 text-sm sm:text-base mt-2 sm:mt-0 w-full sm:w-auto hover:shadow-glow"
           >
-            {isProcessing ? 'Обработка...' : 'Купить за 10 TON'}
+            {isProcessing ? 'Обработка...' : 'Купить за 1 TON'}
           </button>
         )}
       </div>
