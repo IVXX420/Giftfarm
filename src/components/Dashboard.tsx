@@ -7,6 +7,7 @@ import SubscriptionService from '../services/subscription';
 import { NFT } from '../types/nft';
 import NFTCard from './NFTCard';
 import SubscriptionPanel from './SubscriptionPanel';
+import Logo from './Logo';
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -162,11 +163,7 @@ const Dashboard: React.FC = () => {
       <div className="min-h-screen flex items-center justify-center p-4 animate-gradient">
         <div className="glass-panel p-8 max-w-md w-full hover-scale">
           <div className="flex justify-center mb-8">
-            <img 
-              src="/gift-logo.png" 
-              alt="GIFT Farm" 
-              className="h-24 w-24 animate-bounce-sm"
-            />
+            <Logo />
           </div>
           <h1 className="text-4xl font-bold mb-6 text-center gradient-text">
             GIFT Farm
