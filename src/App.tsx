@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import WalletConnect from './components/WalletConnect';
@@ -32,8 +32,36 @@ const Description = styled.p`
   line-height: 1.5;
 `;
 
+const LoadingScreen = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: var(--tg-theme-bg-color, #ffffff);
+  color: var(--tg-theme-text-color, #000000);
+`;
+
 const App: React.FC = () => {
   const [tonConnectUI] = useTonConnectUI();
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const initConnection = async () => {
+      try {
+        await tonConnectUI.connectionRestored;
+      } catch (err) {
+        console.error('Ошибка восстановления подключения:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    initConnection();
+  }, [tonConnectUI]);
+
+  if (isLoading) {
+    return <LoadingScreen>Загрузка...</LoadingScreen>;
+  }
 
   return (
     <Router>
