@@ -21,6 +21,5 @@ export function useTonConnect() {
   return {
     connected,
     wallet: tonConnectUI.account,
-    network: tonConnectUI.network,
   };
 } 

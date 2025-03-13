@@ -12,12 +12,12 @@ const Dashboard: React.FC = () => {
 
   // Загрузка NFT
   const loadNFTs = async () => {
-    if (!wallet?.account.address) return;
+    if (!wallet?.address) return;
     
     try {
       setIsLoading(true);
-      console.log('Загрузка NFT для адреса:', wallet.account.address);
-      const userNFTs = await NFTService.getUserNFTs(wallet.account.address);
+      console.log('Загрузка NFT для адреса:', wallet.address);
+      const userNFTs = await NFTService.getUserNFTs(wallet.address);
       setNfts(userNFTs);
     } catch (error) {
       console.error('Ошибка при загрузке NFT:', error);
@@ -36,10 +36,10 @@ const Dashboard: React.FC = () => {
 
   // Загрузка NFT при подключении кошелька
   useEffect(() => {
-    if (connected && wallet?.account.address) {
+    if (connected && wallet?.address) {
       loadNFTs();
     }
-  }, [connected, wallet?.account.address]);
+  }, [connected, wallet?.address]);
 
   // Обновление баланса каждые 2 секунды
   useEffect(() => {
