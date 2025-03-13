@@ -74,32 +74,35 @@ const NFTCard: React.FC<NFTCardProps> = ({ nft, onBalanceUpdate }) => {
 
   return (
     <div 
-      className="bg-gray-800/50 backdrop-blur-lg rounded-lg shadow-md p-3 transform transition-all duration-500 hover:scale-[1.02] hover:shadow-lg border border-gray-700/50 group"
+      className="card-base p-4 hover:scale-[1.02] hover:shadow-xl group bg-black/30"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="relative pb-[100%] mb-3 overflow-hidden rounded-md border border-gray-600/50 group-hover:border-blue-400/30 transition-colors duration-300">
+      <div className="relative pb-[100%] mb-4 overflow-hidden rounded-xl border border-gray-700/50 group-hover:border-blue-400/30 transition-all duration-300">
         <img 
           src={nft.metadata.image} 
           alt={nft.metadata.name} 
           className={`absolute top-0 left-0 w-full h-full object-cover transition-all duration-500 ${
-            isHovered ? 'scale-110 brightness-110' : 'scale-100 brightness-100'
+            isHovered ? 'scale-110 brightness-110' : 'scale-100 brightness-90'
           }`}
         />
         {isStaking && timeLeft > 0 && (
-          <div className="absolute top-2 right-2 bg-black/80 text-white px-2 py-0.5 rounded-full text-xs font-medium border border-gray-600/50 backdrop-blur-sm animate-pulse">
+          <div className="absolute top-3 right-3 bg-black/80 text-white px-3 py-1 rounded-full text-sm font-medium border border-blue-400/30 backdrop-blur-sm animate-pulse">
             Фарминг
           </div>
         )}
+        <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/80 to-transparent">
+          <h3 className="text-base font-bold truncate text-white group-hover:text-blue-400 transition-colors duration-300">
+            {nft.metadata.name}
+          </h3>
+        </div>
       </div>
-      
-      <h3 className="text-base font-bold mb-2 truncate text-gray-200 group-hover:text-blue-400 transition-colors duration-300">{nft.metadata.name}</h3>
       
       {!isStaking && timeLeft === 0 && (
         <button
           onClick={handleStartFarming}
           disabled={isLoading}
-          className="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2 px-3 rounded-md hover:from-blue-600 hover:to-blue-700 transition-all duration-300 disabled:from-gray-600 disabled:to-gray-700 disabled:cursor-not-allowed text-sm font-medium shadow-sm hover:shadow-md transform hover:-translate-y-0.5 disabled:hover:translate-y-0 disabled:hover:shadow-sm border border-blue-400/20 group-hover:border-blue-400/40"
+          className="button-base py-3 px-4 text-sm font-medium w-full"
         >
           {isLoading ? (
             <span className="flex items-center justify-center">
@@ -111,6 +114,9 @@ const NFTCard: React.FC<NFTCardProps> = ({ nft, onBalanceUpdate }) => {
             </span>
           ) : (
             <span className="flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
               Начать фарм
             </span>
           )}
@@ -118,14 +124,29 @@ const NFTCard: React.FC<NFTCardProps> = ({ nft, onBalanceUpdate }) => {
       )}
 
       {isStaking && timeLeft > 0 && (
-        <div className="text-center py-1">
-          <p className="text-gray-400 text-sm mb-1">До окончания фарма:</p>
-          <p className="text-xl font-bold mb-2 bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600 bg-clip-text text-transparent animate-pulse">
-            {formatTime(timeLeft)}
-          </p>
-          <p className="text-sm text-gray-300 group-hover:text-gray-200 transition-colors duration-300">
-            Накоплено GIFT: <span className="font-bold text-blue-400 group-hover:text-blue-300">{accumulatedGift.toFixed(3)}</span>
-          </p>
+        <div className="space-y-3">
+          <div className="bg-blue-900/30 rounded-lg p-3">
+            <div className="flex justify-between items-center mb-2">
+              <p className="text-gray-400 text-sm">До окончания:</p>
+              <p className="text-lg font-bold gradient-text animate-pulse">
+                {formatTime(timeLeft)}
+              </p>
+            </div>
+            <div className="w-full bg-gray-700/50 rounded-full h-1.5">
+              <div 
+                className="bg-gradient-to-r from-blue-400 to-blue-600 h-1.5 rounded-full transition-all duration-300"
+                style={{ width: `${(1 - timeLeft / (12 * 60 * 60 * 1000)) * 100}%` }}
+              />
+            </div>
+          </div>
+          <div className="bg-blue-900/30 rounded-lg p-3">
+            <div className="flex justify-between items-center">
+              <p className="text-gray-400 text-sm">Накоплено:</p>
+              <p className="text-lg font-bold text-blue-400">
+                {accumulatedGift.toFixed(3)} GIFT
+              </p>
+            </div>
+          </div>
         </div>
       )}
 
@@ -133,7 +154,7 @@ const NFTCard: React.FC<NFTCardProps> = ({ nft, onBalanceUpdate }) => {
         <button
           onClick={handleCollectReward}
           disabled={isLoading}
-          className="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2 px-3 rounded-md hover:from-blue-600 hover:to-blue-700 transition-all duration-300 disabled:from-gray-600 disabled:to-gray-700 disabled:cursor-not-allowed text-sm font-medium shadow-sm hover:shadow-md transform hover:-translate-y-0.5 disabled:hover:translate-y-0 disabled:hover:shadow-sm border border-blue-400/20 group-hover:border-blue-400/40"
+          className="button-base py-3 px-4 text-sm font-medium w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
         >
           {isLoading ? (
             <span className="flex items-center justify-center">
@@ -145,7 +166,10 @@ const NFTCard: React.FC<NFTCardProps> = ({ nft, onBalanceUpdate }) => {
             </span>
           ) : (
             <span className="flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
-              {`Собрать ${accumulatedGift.toFixed(3)} GIFT`}
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+              Собрать {accumulatedGift.toFixed(3)} GIFT
             </span>
           )}
         </button>
