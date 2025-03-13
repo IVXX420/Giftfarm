@@ -7,7 +7,6 @@ import SubscriptionService from '../services/subscription';
 import { NFT } from '../types/nft';
 import NFTCard from './NFTCard';
 import SubscriptionPanel from './SubscriptionPanel';
-import TopPanel from './TopPanel';
 import StatsPanel from './StatsPanel';
 import Logo from './Logo';
 
