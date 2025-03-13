@@ -64,6 +64,8 @@ class NFTService {
   // Получить список всех NFT на кошельке
   private async fetchAccountNFTs(address: string): Promise<any[]> {
     try {
+      console.log('Запрашиваем NFT по адресу:', `${this.apiEndpoint}/accounts/${address}/nfts?limit=1000`);
+      
       const response = await fetch(`${this.apiEndpoint}/accounts/${address}/nfts?limit=1000`, {
         headers: {
           'Authorization': `Bearer ${this.apiKey}`,
@@ -78,6 +80,7 @@ class NFTService {
       }
 
       const data = await response.json();
+      console.log('Ответ от API:', data);
       return data.nfts || [];
     } catch (error) {
       console.error('Ошибка при получении списка NFT:', error);
@@ -87,11 +90,23 @@ class NFTService {
 
   // Фильтруем NFT из поддерживаемых коллекций
   private filterSupportedNFTs(nfts: any[]): any[] {
+    console.log('Поддерживаемые коллекции:', SUPPORTED_COLLECTIONS);
+    console.log('Все полученные NFT:', nfts);
+    
     return nfts.filter(nft => {
       const collectionAddress = nft.collection?.address;
-      const isSupported = SUPPORTED_COLLECTIONS.some(
-        collection => collection.address.toLowerCase() === collectionAddress?.toLowerCase()
-      );
+      console.log('Проверяем NFT:', {
+        address: nft.address,
+        collectionAddress: collectionAddress,
+        metadata: nft.metadata
+      });
+      
+      const isSupported = SUPPORTED_COLLECTIONS.some(collection => {
+        const matches = collection.address.toLowerCase() === collectionAddress?.toLowerCase();
+        console.log(`Сравниваем: ${collection.address} с ${collectionAddress} = ${matches}`);
+        return matches;
+      });
+      
       console.log(`NFT ${nft.address} из коллекции ${collectionAddress} поддерживается: ${isSupported}`);
       return isSupported;
     });
