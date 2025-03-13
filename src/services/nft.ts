@@ -13,13 +13,30 @@ interface FarmingState {
 class NFTService {
   private farmingState: FarmingState = {};
   private tonClient: TonClient;
+  private apiEndpoint: string;
+  private apiKey: string;
 
   constructor() {
+    this.apiEndpoint = import.meta.env.VITE_TON_ENDPOINT;
+    this.apiKey = import.meta.env.VITE_TON_API_KEY;
     this.tonClient = new TonClient({
-      endpoint: import.meta.env.VITE_TON_ENDPOINT,
-      apiKey: import.meta.env.VITE_TON_API_KEY,
+      endpoint: this.apiEndpoint,
+      apiKey: this.apiKey,
     });
     this.loadFarmingState();
+  }
+
+  private async makeRequest(url: string) {
+    const response = await fetch(url, {
+      headers: {
+        'Authorization': `Bearer ${this.apiKey}`,
+        'Content-Type': 'application/json',
+      },
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return response.json();
   }
 
   private loadFarmingState() {
@@ -37,8 +54,7 @@ class NFTService {
   async getUserNFTs(userAddress: string): Promise<NFT[]> {
     try {
       // Получаем NFT через API
-      const response = await fetch(`${import.meta.env.VITE_TON_ENDPOINT}/v2/accounts/${userAddress}/nfts`);
-      const data = await response.json();
+      const data = await this.makeRequest(`${this.apiEndpoint}/v2/accounts/${userAddress}/nfts`);
       const nfts = data.nfts || [];
 
       // Фильтруем только NFT из поддерживаемых коллекций
@@ -75,12 +91,11 @@ class NFTService {
   // Получить метаданные NFT
   private async getNFTMetadata(nftAddress: string) {
     try {
-      const response = await fetch(`${import.meta.env.VITE_TON_ENDPOINT}/v2/nfts/${nftAddress}/metadata`);
-      const metadata = await response.json();
+      const metadata = await this.makeRequest(`${this.apiEndpoint}/v2/nfts/${nftAddress}/metadata`);
       
       return {
         name: metadata.name || 'Unnamed NFT',
-        description: metadata.description,
+        description: metadata.description || '',
         image: metadata.image || '',
         attributes: metadata.attributes || [],
       };
@@ -88,6 +103,7 @@ class NFTService {
       console.error('Ошибка при получении метаданных NFT:', error);
       return {
         name: 'Error loading NFT',
+        description: '',
         image: '',
         attributes: [],
       };
