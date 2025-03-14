@@ -7,7 +7,7 @@ import App from './App';
 import './index.css';
 
 // Манифест для TON Connect
-const manifestUrl = 'https://votipapa.vercel.app/ton-connect-manifest.json';
+const manifestUrl = 'https://ivxx420.github.io/Giftfarm/ton-connect-manifest.json';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
