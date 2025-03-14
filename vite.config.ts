@@ -20,15 +20,19 @@ export default defineConfig({
       '@': resolve(__dirname, 'src'),
     },
   },
-  base: '/Giftfarm/',
+  base: './',
+  optimizeDeps: {
+    include: ['zod', '@vkruglikov/react-telegram-web-app']
+  },
   build: {
     outDir: 'dist',
     sourcemap: true,
     rollupOptions: {
       output: {
         manualChunks: {
-          vendor: ['react', 'react-dom', 'styled-components'],
+          vendor: ['react', 'react-dom', 'styled-components', 'zod'],
           ton: ['@ton/core', '@ton/crypto', '@ton/ton'],
+          tg: ['@vkruglikov/react-telegram-web-app']
         },
       },
     },
