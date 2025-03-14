@@ -3,5 +3,8 @@
   "name": "Gift Farm",
   "iconUrl": "https://ivxx420.github.io/Giftfarm/gift.svg",
   "termsOfUseUrl": "https://ivxx420.github.io/Giftfarm/terms",
-  "privacyPolicyUrl": "https://ivxx420.github.io/Giftfarm/privacy"
+  "privacyPolicyUrl": "https://ivxx420.github.io/Giftfarm/privacy",
+  "aboutUrl": "https://ivxx420.github.io/Giftfarm/about",
+  "version": "1.0.0",
+  "permissions": ["ton_addr"]
 } 

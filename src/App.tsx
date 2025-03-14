@@ -23,13 +23,18 @@ const AppContent: React.FC<AppContentProps> = ({ onError }) => {
 
   // Настраиваем Telegram Web App
   useEffect(() => {
-    if (webApp) {
-      webApp.ready();
-      webApp.expand();
-      
-      // Устанавливаем цвета для темной темы
-      webApp.setHeaderColor('#1e3a8a');
-      webApp.setBackgroundColor('#0c4a6e');
+    try {
+      if (webApp) {
+        webApp.ready();
+        webApp.expand();
+        
+        // Устанавливаем цвета для темной темы
+        webApp.setHeaderColor('#1e3a8a');
+        webApp.setBackgroundColor('#0c4a6e');
+      }
+    } catch (error) {
+      console.error('Ошибка инициализации Telegram Web App:', error);
+      onError?.(error as Error);
     }
   }, [webApp]);
 
@@ -102,7 +107,8 @@ const AppContent: React.FC<AppContentProps> = ({ onError }) => {
             style={{
               backgroundImage: `url(${backgroundImage.pattern})`,
               backgroundSize: 'cover',
-              backgroundPosition: 'center'
+              backgroundPosition: 'center',
+              backgroundRepeat: 'repeat'
             }}
           />
         )}
@@ -112,7 +118,8 @@ const AppContent: React.FC<AppContentProps> = ({ onError }) => {
             style={{
               backgroundImage: `url(${backgroundImage.image})`,
               backgroundSize: 'cover',
-              backgroundPosition: 'center'
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat'
             }}
           />
         )}
