@@ -1,5 +1,6 @@
 name: Деплой на Vercel
 
+# Автоматический деплой на Vercel при пуше в main
 on:
   push:
     branches: [ main ]
