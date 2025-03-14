@@ -276,8 +276,9 @@ const Dashboard: React.FC = () => {
               <NFTCard
                 key={nft.address}
                 nft={nft}
-                onStartFarming={() => updateNFTState(nft.address, true)}
-                onCollectRewards={() => updateNFTState(nft.address, false)}
+                onStakeChange={updateNFTState}
+                onRewardCollect={updateTotalGift}
+                onError={(error) => console.error('Ошибка в NFTCard:', error)}
               />
             ))}
           </div>

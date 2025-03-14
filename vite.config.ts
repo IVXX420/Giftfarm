@@ -27,9 +27,9 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          vendor: ['react', 'react-dom', 'styled-components'],
-          ton: ['@ton/core', '@ton/crypto', '@ton/ton'],
-        },
+          vendor: ['react', 'react-dom', 'react-router-dom'],
+          ton: ['@tonconnect/ui-react']
+        }
       },
     },
   },
@@ -48,6 +48,9 @@ export default defineConfig({
         secure: true,
         rewrite: (path) => path.replace(/^\/ton/, '')
       }
+    },
+    headers: {
+      'Content-Type': 'application/javascript'
     }
   },
   preview: {
