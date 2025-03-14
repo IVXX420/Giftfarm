@@ -8,8 +8,6 @@ import { BackgroundProvider, useBackground } from './context/BackgroundContext';
 import LoadingScreen from './components/LoadingScreen';
 import Header from './components/Header';
 import Dashboard from './components/Dashboard';
-import Leaderboard from './components/Leaderboard';
-import LeaderboardService from './services/leaderboard';
 
 interface AppContentProps {
   onError?: (error: Error) => void;
@@ -26,10 +24,12 @@ const AppContent: React.FC<AppContentProps> = ({ onError }) => {
     const updateUserStatus = async (isOnline: boolean) => {
       if (tonConnectUI.account?.address) {
         try {
-          await LeaderboardService.getInstance().updateUserStatus(
-            tonConnectUI.account.address,
-            isOnline
-          );
+          // Временно отключаем обновление статуса
+          console.log('Обновление статуса временно отключено');
+          // await LeaderboardService.getInstance().updateUserStatus(
+          //   tonConnectUI.account.address,
+          //   isOnline
+          // );
         } catch (error) {
           console.error('Ошибка при обновлении статуса:', error);
         }
@@ -126,7 +126,6 @@ const AppContent: React.FC<AppContentProps> = ({ onError }) => {
             <Route path="/dashboard" element={
               tonConnectUI.account ? <Dashboard onError={onError} /> : <Navigate to="/" replace />
             } />
-            <Route path="/leaderboard" element={<Leaderboard />} />
           </Routes>
         </main>
       </div>

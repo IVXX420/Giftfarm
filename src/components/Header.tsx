@@ -1,4 +1,5 @@
 import { useTonConnect } from '../hooks/useTonConnect';
+import { Link } from 'react-router-dom';
 
 interface HeaderProps {
   onDisconnect: () => Promise<void>;

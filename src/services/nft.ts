@@ -196,15 +196,13 @@ class NFTService {
       const data = await response.json();
       console.log('Сырой ответ от API:', data);
       
-      // Проверяем наличие nft_items в ответе
-      if (!data.nft_items && !data.nfts) {
+      // Проверяем наличие nfts в ответе
+      if (!data.nfts) {
         console.error('Неожиданный формат ответа API:', data);
         return [];
       }
 
-      const nfts = data.nft_items || data.nfts || [];
-      console.log('Обработанные NFT из ответа:', nfts);
-      return nfts;
+      return data.nfts;
     } catch (error) {
       console.error('Ошибка при получении списка NFT:', error);
       throw error;
