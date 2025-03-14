@@ -6,28 +6,22 @@ on:
       - main
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v3
         with:
           node-version: '18'
-
-      - name: Install Dependencies
+          
+      - name: Install dependencies
         run: npm install
-
+        
       - name: Build
         run: npm run build
-        env:
-          VITE_TON_API_KEY: ${{ secrets.VITE_TON_API_KEY }}
-          VITE_TON_ENDPOINT: https://api.ton.cat/v2
-          VITE_MANIFEST_URL: https://ivxx420.github.io/Giftfarm/ton-connect-manifest.json
-          VITE_API_URL: https://ivxx420.github.io/api
-
+        
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
