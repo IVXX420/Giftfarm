@@ -21,18 +21,26 @@ export default defineConfig({
     },
   },
   base: '/Giftfarm/',
+  publicDir: 'public',
   optimizeDeps: {
     include: ['zod', '@vkruglikov/react-telegram-web-app']
   },
   build: {
     outDir: 'dist',
     sourcemap: true,
+    assetsDir: '',
     rollupOptions: {
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom', 'styled-components', 'zod'],
           ton: ['@ton/core', '@ton/crypto', '@ton/ton'],
           tg: ['@vkruglikov/react-telegram-web-app']
+        },
+        assetFileNames: (assetInfo) => {
+          if (assetInfo.name === 'gift.svg') {
+            return 'gift.svg';
+          }
+          return 'assets/[name]-[hash][extname]';
         }
       }
     }

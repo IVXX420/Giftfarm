@@ -11,7 +11,7 @@ const manifestUrl = 'https://ivxx420.github.io/Giftfarm/ton-connect-manifest.jso
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <BrowserRouter>
+    <BrowserRouter basename="/Giftfarm">
       <WebAppProvider>
         <TonConnectUIProvider manifestUrl={manifestUrl}>
           <App />
