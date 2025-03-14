@@ -18,10 +18,6 @@ interface TonConnect {
 class SubscriptionService {
   private static readonly PREMIUM_KEY = 'is_premium';
   private static readonly FARMING_MULTIPLIER = 1.5;
-<<<<<<< HEAD
-  private static readonly SUBSCRIPTION_KEY = 'subscription_status';
-=======
->>>>>>> e49eebaea57194cdd7c7e8d3a16e8deda6ab08a6
 
   static isPremium(): boolean {
     return localStorage.getItem(this.PREMIUM_KEY) === 'true';
@@ -83,16 +79,6 @@ class SubscriptionService {
     }
   }
 
-<<<<<<< HEAD
-  static async cancelSubscription() {
-    try {
-      await PaymentService.activateSubscription();
-      localStorage.removeItem(this.SUBSCRIPTION_KEY);
-      this.deactivatePremium();
-      return true;
-    } catch (error) {
-      console.error('Error canceling subscription:', error);
-=======
   static async cancelSubscription(): Promise<boolean> {
     try {
       PaymentService.deactivateSubscription();
@@ -100,7 +86,6 @@ class SubscriptionService {
       return true;
     } catch (error) {
       console.error('Ошибка при отмене подписки:', error);
->>>>>>> e49eebaea57194cdd7c7e8d3a16e8deda6ab08a6
       throw error;
     }
   }

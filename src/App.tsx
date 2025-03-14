@@ -21,29 +21,18 @@ const AppContent: React.FC<AppContentProps> = ({ onError }) => {
 
   // Обновляем статус пользователя при подключении/отключении
   useEffect(() => {
-    const updateUserStatus = async (isOnline: boolean) => {
-      if (tonConnectUI.account?.address) {
-        try {
-          // Временно отключаем обновление статуса
-          console.log('Обновление статуса временно отключено');
-          // await LeaderboardService.getInstance().updateUserStatus(
-          //   tonConnectUI.account.address,
-          //   isOnline
-          // );
-        } catch (error) {
-          console.error('Ошибка при обновлении статуса:', error);
-        }
-      }
+    const updateUserStatus = async () => {
+      console.log('Обновление статуса временно отключено');
     };
 
     if (tonConnectUI.account) {
-      updateUserStatus(true);
+      updateUserStatus();
     }
 
     // Очищаем статус при размонтировании
     return () => {
       if (tonConnectUI.account) {
-        updateUserStatus(false);
+        updateUserStatus();
       }
     };
   }, [tonConnectUI.account]);
