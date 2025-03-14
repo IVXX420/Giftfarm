@@ -10,7 +10,11 @@ import SubscriptionPanel from './SubscriptionPanel';
 import StatsPanel from './StatsPanel';
 import Logo from './Logo';
 
-const Dashboard: React.FC = () => {
+interface DashboardProps {
+  onError?: (error: Error) => void;
+}
+
+const Dashboard: React.FC<DashboardProps> = ({ onError }) => {
   const navigate = useNavigate();
   const { connected, wallet } = useTonConnect();
   const [tonConnectUI] = useTonConnectUI();
@@ -33,6 +37,9 @@ const Dashboard: React.FC = () => {
       setNfts(userNFTs);
     } catch (error) {
       console.error('Ошибка при загрузке NFT:', error);
+      if (onError) {
+        onError(error as Error);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -51,6 +58,9 @@ const Dashboard: React.FC = () => {
       setTotalGift(totalBalance);
     } catch (error) {
       console.error('Ошибка при обновлении баланса:', error);
+      if (onError) {
+        onError(error as Error);
+      }
     }
   };
 
@@ -73,6 +83,9 @@ const Dashboard: React.FC = () => {
       window.location.reload();
     } catch (error) {
       console.error('Ошибка при оформлении подписки:', error);
+      if (onError) {
+        onError(error as Error);
+      }
     }
   };
 
@@ -92,6 +105,9 @@ const Dashboard: React.FC = () => {
       updateTotalGift();
     } catch (error) {
       console.error('Ошибка при запуске всех NFT:', error);
+      if (onError) {
+        onError(error as Error);
+      }
     }
   };
 
@@ -113,6 +129,9 @@ const Dashboard: React.FC = () => {
       }
     } catch (error) {
       console.error('Ошибка при сборе всех наград:', error);
+      if (onError) {
+        onError(error as Error);
+      }
     }
   };
 
@@ -145,6 +164,9 @@ const Dashboard: React.FC = () => {
       navigate('/dashboard');
     } catch (error) {
       console.error('Ошибка подключения:', error);
+      if (onError) {
+        onError(error as Error);
+      }
     } finally {
       setIsConnecting(false);
     }

@@ -1,11 +1,40 @@
 import PaymentService from './payment';
 
+interface TonConnectResult {
+  boc: string;
+  [key: string]: any;
+}
+
+interface TonConnect {
+  sendTransaction: (transaction: {
+    validUntil: number;
+    messages: Array<{
+      address: string;
+      amount: string;
+    }>;
+  }) => Promise<TonConnectResult>;
+}
+
 class SubscriptionService {
-  private static FARMING_MULTIPLIER = 1.5;
+  private static readonly PREMIUM_KEY = 'is_premium';
+  private static readonly FARMING_MULTIPLIER = 1.5;
+  private static readonly SUBSCRIPTION_KEY = 'subscription_status';
+
+  static isPremium(): boolean {
+    return localStorage.getItem(this.PREMIUM_KEY) === 'true';
+  }
+
+  static activatePremium(): void {
+    localStorage.setItem(this.PREMIUM_KEY, 'true');
+  }
+
+  static deactivatePremium(): void {
+    localStorage.removeItem(this.PREMIUM_KEY);
+  }
 
   // Получить множитель фарминга
   static getFarmingMultiplier(): number {
-    return this.isSubscribed() ? this.FARMING_MULTIPLIER : 1;
+    return this.isPremium() ? this.FARMING_MULTIPLIER : 1;
   }
 
   // Проверить статус подписки
@@ -19,32 +48,46 @@ class SubscriptionService {
   }
 
   // Оформить подписку
-  static async subscribe(tonConnect: any) {
+  static async subscribe(tonConnect: TonConnect): Promise<boolean> {
     try {
       console.log('Начало оформления подписки');
       
-      // Создаем транзакцию для оплаты
       const transaction = await PaymentService.createSubscriptionPayment();
+      if (!transaction) {
+        throw new Error('Не удалось создать транзакцию');
+      }
+      
       console.log('Транзакция создана:', transaction);
 
-      // Отправляем транзакцию через TON Connect
       const result = await tonConnect.sendTransaction({
         validUntil: transaction.validUntil,
         messages: transaction.messages
       });
+      
       console.log('Результат транзакции:', result);
 
-      if (result && result.boc) {
-        // Если транзакция успешна, активируем подписку
+      if (result?.boc) {
         PaymentService.activateSubscription();
+        this.activatePremium();
         console.log('Подписка активирована');
         return true;
       }
 
-      console.log('Транзакция не удалась');
-      return false;
+      throw new Error('Транзакция не удалась');
     } catch (error) {
       console.error('Ошибка при оформлении подписки:', error);
+      throw error;
+    }
+  }
+
+  static async cancelSubscription() {
+    try {
+      await PaymentService.activateSubscription();
+      localStorage.removeItem(this.SUBSCRIPTION_KEY);
+      this.deactivatePremium();
+      return true;
+    } catch (error) {
+      console.error('Error canceling subscription:', error);
       throw error;
     }
   }

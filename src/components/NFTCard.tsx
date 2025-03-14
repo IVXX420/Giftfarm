@@ -2,32 +2,40 @@ import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { NFT } from '../types/nft';
 import NFTService from '../services/nft';
+import { useBackground } from '../context/BackgroundContext';
+import SubscriptionService from '../services/subscription';
 
 interface NFTCardProps {
   nft: NFT;
   onStartFarming: () => void;
   onCollectRewards: () => void;
+  onError?: (error: Error) => void;
 }
 
-const NFTCard: React.FC<NFTCardProps> = ({ nft, onStartFarming, onCollectRewards }) => {
+const NFTCard: React.FC<NFTCardProps> = ({ nft, onStartFarming, onCollectRewards, onError }) => {
   const [timeLeft, setTimeLeft] = useState<number>(0);
   const [isStaking, setIsStaking] = useState<boolean>(nft.isStaking);
   const [accumulatedGift, setAccumulatedGift] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isHovered, setIsHovered] = useState<boolean>(false);
+  const { setBackgroundImage, backgroundImage, sourceNFTAddress, resetBackground } = useBackground();
 
   useEffect(() => {
     const updateTimer = () => {
       if (isStaking) {
         const now = Date.now();
-        const endTime = nft.stakingStartTime + (12 * 60 * 60 * 1000); // 12 часов в миллисекундах
+        const endTime = nft.stakingStartTime + (12 * 60 * 60 * 1000);
         const remaining = Math.max(0, endTime - now);
         setTimeLeft(remaining);
 
-        // Обновляем накопленные GIFT
-        NFTService.getAccumulatedGift(nft.address).then(amount => {
-          setAccumulatedGift(amount);
-        });
+        NFTService.getAccumulatedGift(nft.address)
+          .then(amount => {
+            setAccumulatedGift(amount);
+          })
+          .catch(error => {
+            console.error('Ошибка при получении накопленных GIFT:', error);
+            onError?.(error);
+          });
 
         if (remaining <= 0) {
           setIsStaking(false);
@@ -39,7 +47,7 @@ const NFTCard: React.FC<NFTCardProps> = ({ nft, onStartFarming, onCollectRewards
     updateTimer();
     const timer = setInterval(updateTimer, 1000);
     return () => clearInterval(timer);
-  }, [isStaking, nft.stakingStartTime, nft.address, onCollectRewards]);
+  }, [isStaking, nft.stakingStartTime, nft.address, onCollectRewards, onError]);
 
   const formatTime = (ms: number): string => {
     const hours = Math.floor(ms / (1000 * 60 * 60));
@@ -62,6 +70,7 @@ const NFTCard: React.FC<NFTCardProps> = ({ nft, onStartFarming, onCollectRewards
       toast.error(`Ошибка при запуске фарминга ${nft.metadata.name} 😕`, {
         theme: 'dark',
       });
+      onError?.(error as Error);
     } finally {
       setIsLoading(false);
     }
@@ -82,9 +91,53 @@ const NFTCard: React.FC<NFTCardProps> = ({ nft, onStartFarming, onCollectRewards
       toast.error(`Ошибка при сборе наград с ${nft.metadata.name} 😕`, {
         theme: 'dark',
       });
+      onError?.(error as Error);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleSetBackground = async () => {
+    try {
+      if (!SubscriptionService.isPremium()) {
+        toast.error('Смена фона доступна только для премиум пользователей! 💎', {
+          theme: 'dark',
+        });
+        return;
+      }
+
+      setIsLoading(true);
+      console.log('Начинаем получение фона для NFT:', nft);
+      const background = await NFTService.getNFTBackground(nft);
+      console.log('Полученный фон:', background);
+      
+      if (background.color || background.pattern || background.image) {
+        setBackgroundImage(background, nft.address);
+        toast.success('Фон успешно установлен');
+      } else {
+        toast.warning('Не удалось определить фон для этого NFT');
+      }
+    } catch (error) {
+      console.error('Ошибка при установке фона:', error);
+      toast.error('Ошибка при установке фона');
+      onError?.(error as Error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleResetBackground = () => {
+    if (!SubscriptionService.isPremium()) {
+      toast.error('Смена фона доступна только для премиум пользователей! 💎', {
+        theme: 'dark',
+      });
+      return;
+    }
+
+    resetBackground();
+    toast.success('Фон сброшен! 🔄', {
+      theme: 'dark',
+    });
   };
 
   return (
@@ -101,15 +154,44 @@ const NFTCard: React.FC<NFTCardProps> = ({ nft, onStartFarming, onCollectRewards
             isHovered ? 'scale-110 brightness-110' : 'scale-100 brightness-90'
           }`}
         />
-        {isStaking && timeLeft > 0 && (
-          <div className="absolute top-2 sm:top-3 right-2 sm:right-3 backdrop-blur-md bg-black/50 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium text-blue-400 border border-blue-400/30">
-            Фарминг
-          </div>
-        )}
         <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-3 bg-gradient-to-t from-black/90 via-black/50 to-transparent">
-          <h3 className="text-sm sm:text-base font-bold truncate text-white group-hover:text-blue-400 transition-colors duration-300">
-            {nft.metadata.name}
-          </h3>
+          <div className="flex justify-between items-center">
+            <h3 className="text-sm sm:text-base font-bold truncate text-white group-hover:text-blue-400 transition-colors duration-300">
+              {nft.metadata.name}
+            </h3>
+            {isStaking && timeLeft > 0 && (
+              <div className="backdrop-blur-md bg-black/50 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium text-blue-400 border border-blue-400/30">
+                Фарминг
+              </div>
+            )}
+          </div>
+        </div>
+        <div className="absolute top-2 sm:top-3 left-2 sm:left-3 flex gap-2">
+          {SubscriptionService.isPremium() ? (
+            <>
+              <button
+                onClick={handleSetBackground}
+                className="backdrop-blur-md bg-black/50 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium text-purple-400 border border-purple-400/30 hover:bg-purple-400/20 transition-all duration-300"
+              >
+                Выбрать фон
+              </button>
+              {backgroundImage && sourceNFTAddress === nft.address && (
+                <button
+                  onClick={handleResetBackground}
+                  className="backdrop-blur-md bg-black/50 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium text-red-400 border border-red-400/30 hover:bg-red-400/20 transition-all duration-300"
+                >
+                  Убрать фон
+                </button>
+              )}
+            </>
+          ) : (
+            <button
+              onClick={() => toast.error('Смена фона доступна только для премиум пользователей! 💎', { theme: 'dark' })}
+              className="backdrop-blur-md bg-black/50 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium text-gray-400 border border-gray-400/30 hover:bg-gray-400/20 transition-all duration-300"
+            >
+              Премиум функция
+            </button>
+          )}
         </div>
       </div>
       

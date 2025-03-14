@@ -25,19 +25,23 @@ export default defineConfig({
     sourcemap: true,
     rollupOptions: {
       output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom', 'styled-components'],
-          ton: ['@ton/core', '@ton/crypto', '@ton/ton'],
+        format: 'es',
+        generatedCode: {
+          constBindings: true
         },
-      },
-    },
+        manualChunks: {
+          vendor: ['react', 'react-dom', 'react-router-dom'],
+          ton: ['@tonconnect/ui-react']
+        }
+      }
+    }
   },
   server: {
     port: 3000,
-    host: true,
+    host: true
   },
   preview: {
     port: 3000,
-    host: true,
+    host: true
   }
 }); 

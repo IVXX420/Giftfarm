@@ -9,6 +9,45 @@ class NFTService {
   private apiKey: string;
   private giftBalanceKey = 'gift_balance';
 
+  private colorMap: { [key: string]: string } = {
+    'chestnut': '#954535',
+    'red': '#FF0000',
+    'blue': '#0000FF',
+    'green': '#00FF00',
+    'yellow': '#FFFF00',
+    'purple': '#800080',
+    'orange': '#FFA500',
+    'pink': '#FFC0CB',
+    'white': '#FFFFFF',
+    'black': '#000000',
+    'gray': '#808080',
+    'brown': '#A52A2A',
+    'gold': '#FFD700',
+    'silver': '#C0C0C0',
+    'bronze': '#CD7F32',
+    'navy': '#000080',
+    'maroon': '#800000',
+    'olive': '#808000',
+    'lime': '#00FF00',
+    'aqua': '#00FFFF',
+    'teal': '#008080',
+    'fuchsia': '#FF00FF',
+    'crimson': '#DC143C',
+    'indigo': '#4B0082',
+    'violet': '#EE82EE',
+    'coral': '#FF7F50',
+    'turquoise': '#40E0D0',
+    'beige': '#F5F5DC',
+    'ivory': '#FFFFF0',
+    'lavender': '#E6E6FA',
+    'mint': '#98FF98',
+    'peach': '#FFDAB9',
+    'plum': '#DDA0DD',
+    'salmon': '#FA8072',
+    'tan': '#D2B48C',
+    'wheat': '#F5DEB3'
+  };
+
   constructor() {
     this.apiEndpoint = import.meta.env.VITE_TON_ENDPOINT;
     this.apiKey = import.meta.env.VITE_TON_API_KEY;
@@ -280,6 +319,133 @@ class NFTService {
   // Получить состояние фарминга для NFT
   getFarmingState(nftAddress: string) {
     return this.farmingState[nftAddress];
+  }
+
+  // Получить фон из NFT
+  async getNFTBackground(nft: NFT): Promise<{ color: string; pattern?: string; image?: string }> {
+    try {
+      // Проверяем наличие метаданных
+      if (!nft.metadata?.attributes) {
+        console.log('Нет атрибутов в метаданных:', nft.metadata);
+        return { color: '#1e3a8a' };
+      }
+
+      console.log('Атрибуты NFT:', nft.metadata.attributes);
+
+      // Ищем атрибуты фона в разных форматах
+      const backgroundAttr = nft.metadata.attributes.find(attr => {
+        const traitType = attr.trait_type?.toLowerCase() || '';
+        const name = attr.name?.toLowerCase() || '';
+        const value = attr.value?.toLowerCase() || '';
+        
+        console.log('Проверяем атрибут:', { traitType, name, value });
+        
+        return (
+          traitType.includes('background') ||
+          traitType.includes('bg') ||
+          traitType.includes('backdrop') ||
+          name.includes('background') ||
+          name.includes('bg') ||
+          name.includes('backdrop') ||
+          value.includes('background') ||
+          value.includes('bg') ||
+          value.includes('backdrop')
+        );
+      });
+
+      console.log('Найденный атрибут фона:', backgroundAttr);
+
+      // Ищем паттерн в разных форматах
+      const patternAttr = nft.metadata.attributes.find(attr => {
+        const traitType = attr.trait_type?.toLowerCase() || '';
+        const name = attr.name?.toLowerCase() || '';
+        const value = attr.value?.toLowerCase() || '';
+        
+        return (
+          traitType.includes('pattern') ||
+          traitType.includes('texture') ||
+          traitType.includes('backdrop_pattern') ||
+          name.includes('pattern') ||
+          name.includes('texture') ||
+          name.includes('backdrop_pattern') ||
+          value.includes('pattern') ||
+          value.includes('texture') ||
+          value.includes('backdrop_pattern')
+        );
+      });
+
+      console.log('Найденный атрибут паттерна:', patternAttr);
+
+      // Ищем фоновое изображение в разных форматах
+      const imageAttr = nft.metadata.attributes.find(attr => {
+        const traitType = attr.trait_type?.toLowerCase() || '';
+        const name = attr.name?.toLowerCase() || '';
+        const value = attr.value?.toLowerCase() || '';
+        
+        return (
+          traitType.includes('background_image') ||
+          traitType.includes('bg_image') ||
+          traitType.includes('backdrop_image') ||
+          traitType.includes('background_url') ||
+          traitType.includes('bg_url') ||
+          traitType.includes('backdrop_url') ||
+          name.includes('background_image') ||
+          name.includes('bg_image') ||
+          name.includes('backdrop_image') ||
+          name.includes('background_url') ||
+          name.includes('bg_url') ||
+          name.includes('backdrop_url') ||
+          value.includes('background_image') ||
+          value.includes('bg_image') ||
+          value.includes('backdrop_image') ||
+          value.includes('background_url') ||
+          value.includes('bg_url') ||
+          value.includes('backdrop_url')
+        );
+      });
+
+      console.log('Найденный атрибут изображения:', imageAttr);
+
+      // Если нашли цвет фона, используем его
+      if (backgroundAttr?.value) {
+        const colorValue = backgroundAttr.value.toLowerCase();
+        console.log('Проверяем цвет:', colorValue);
+
+        // Проверяем, является ли значение цветом в HEX или RGB формате
+        const isHexOrRgb = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(colorValue) || 
+                          /^rgb\(\d{1,3},\s*\d{1,3},\s*\d{1,3}\)$/.test(colorValue) ||
+                          /^rgba\(\d{1,3},\s*\d{1,3},\s*\d{1,3},\s*[\d.]+\)$/.test(colorValue);
+
+        if (isHexOrRgb) {
+          return {
+            color: colorValue,
+            pattern: patternAttr?.value,
+            image: imageAttr?.value
+          };
+        }
+
+        // Если это текстовое название цвета, ищем его в маппинге
+        const mappedColor = this.colorMap[colorValue];
+        if (mappedColor) {
+          console.log('Найден маппинг цвета:', mappedColor);
+          return {
+            color: mappedColor,
+            pattern: patternAttr?.value,
+            image: imageAttr?.value
+          };
+        }
+      }
+
+      // Если цвет не найден или не является валидным цветом, используем дефолтный
+      return { 
+        color: '#1e3a8a',
+        pattern: patternAttr?.value,
+        image: imageAttr?.value
+      };
+    } catch (error) {
+      console.error('Ошибка при получении фона:', error);
+      return { color: '#1e3a8a' };
+    }
   }
 }
 
