@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { TonConnectUIProvider, useTonConnectUI } from '@tonconnect/ui-react';
+import { WebAppProvider, useWebApp } from '@vkruglikov/react-telegram-web-app';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { manifestUrl } from './config/ton';
@@ -15,9 +16,22 @@ interface AppContentProps {
 
 const AppContent: React.FC<AppContentProps> = ({ onError }) => {
   const [tonConnectUI] = useTonConnectUI();
+  const webApp = useWebApp();
   const navigate = useNavigate();
   const { backgroundImage, resetBackground } = useBackground();
   const [isLoading, setIsLoading] = useState(true);
+
+  // Настраиваем Telegram Web App
+  useEffect(() => {
+    if (webApp) {
+      webApp.ready();
+      webApp.expand();
+      
+      // Устанавливаем цвета для темной темы
+      webApp.setHeaderColor('#1e3a8a');
+      webApp.setBackgroundColor('#0c4a6e');
+    }
+  }, [webApp]);
 
   // Обновляем статус пользователя при подключении/отключении
   useEffect(() => {
@@ -135,11 +149,13 @@ interface AppProps {
 
 const App: React.FC<AppProps> = ({ onError }) => {
   return (
-    <TonConnectUIProvider manifestUrl={manifestUrl}>
-      <BackgroundProvider>
-        <AppContent onError={onError} />
-      </BackgroundProvider>
-    </TonConnectUIProvider>
+    <WebAppProvider>
+      <TonConnectUIProvider manifestUrl={manifestUrl}>
+        <BackgroundProvider>
+          <AppContent onError={onError} />
+        </BackgroundProvider>
+      </TonConnectUIProvider>
+    </WebAppProvider>
   );
 };
 
