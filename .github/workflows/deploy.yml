@@ -1,40 +1,35 @@
-name: Деплой на Vercel
+name: Deploy to GitHub Pages
 
-# Автоматический деплой на Vercel при пуше в main
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    branches:
+      - main
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
-    env:
-      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v3
 
-      - name: Установка Node.js
-        uses: actions/setup-node@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
         with:
           node-version: '18'
-          cache: 'npm'
 
-      - name: Установка зависимостей
-        run: npm ci
+      - name: Install Dependencies
+        run: npm install
 
-      - name: Сборка проекта
+      - name: Build
         run: npm run build
+        env:
+          VITE_TON_API_KEY: ${{ secrets.VITE_TON_API_KEY }}
+          VITE_TON_ENDPOINT: https://api.ton.cat/v2
+          VITE_MANIFEST_URL: https://ivxx420.github.io/Giftfarm/ton-connect-manifest.json
+          VITE_API_URL: https://ivxx420.github.io/api
 
-      - name: Деплой на Vercel
-        uses: amondnet/vercel-action@v25
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
         with:
-          vercel-token: ${{ env.VERCEL_TOKEN }}
-          vercel-org-id: ${{ env.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ env.VERCEL_PROJECT_ID }}
-          github-comment: false
-          working-directory: ./dist
-          vercel-args: '--prod' 
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist 
