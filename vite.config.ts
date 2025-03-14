@@ -28,19 +28,16 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: true,
-    assetsDir: '',
+    assetsDir: 'assets',
     rollupOptions: {
+      input: {
+        main: resolve(__dirname, 'index.html')
+      },
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom', 'styled-components', 'zod'],
           ton: ['@ton/core', '@ton/crypto', '@ton/ton'],
           tg: ['@vkruglikov/react-telegram-web-app']
-        },
-        assetFileNames: (assetInfo) => {
-          if (assetInfo.name === 'gift.svg') {
-            return 'gift.svg';
-          }
-          return 'assets/[name]-[hash][extname]';
         }
       }
     }
