@@ -1,0 +1,16 @@
+{
+  "name": "Gift Farm",
+  "short_name": "Gift Farm",
+  "description": "Фарминг GIFT токенов с помощью NFT в сети TON",
+  "start_url": "/Giftfarm/",
+  "display": "standalone",
+  "background_color": "#1e3a8a",
+  "theme_color": "#1e3a8a",
+  "icons": [
+    {
+      "src": "gift.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+} 
