@@ -27,9 +27,12 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          vendor: ['react', 'react-dom', 'react-router-dom'],
-          ton: ['@tonconnect/ui-react']
-        }
+          vendor: ['react', 'react-dom', 'react-router-dom', '@tonconnect/ui-react'],
+        },
+        format: 'es',
+        entryFileNames: 'assets/[name]-[hash].js',
+        chunkFileNames: 'assets/[name]-[hash].js',
+        assetFileNames: 'assets/[name]-[hash].[ext]'
       },
     },
   },
