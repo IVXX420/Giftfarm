@@ -85,6 +85,11 @@ class PaymentService {
       return false;
     }
   }
+
+  // Деактивируем подписку
+  static deactivateSubscription() {
+    localStorage.removeItem('subscription');
+  }
 }
 
 export default PaymentService; 
