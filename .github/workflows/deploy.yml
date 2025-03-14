@@ -1,47 +1,34 @@
-name: Deploy to GitHub Pages
+name: Деплой на Vercel
 
 on:
   push:
     branches: [ main ]
-
-permissions:
-  contents: read
-  pages: write
-  id-token: write
+  pull_request:
+    branches: [ main ]
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
-      - name: Setup Node.js
+
+      - name: Установка Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: 'npm'
-          
-      - name: Install dependencies
+
+      - name: Установка зависимостей
         run: npm ci
-        
-      - name: Build
+
+      - name: Сборка проекта
         run: npm run build
-        
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-        
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+
+      - name: Деплой на Vercel
+        uses: amondnet/vercel-action@v25
         with:
-          path: './dist'
-          
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4 
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          working-directory: ./
+          vercel-args: '--prod' 

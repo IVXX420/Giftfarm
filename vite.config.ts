@@ -27,12 +27,9 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          vendor: ['react', 'react-dom', 'react-router-dom', '@tonconnect/ui-react'],
+          vendor: ['react', 'react-dom', 'styled-components'],
+          ton: ['@ton/core', '@ton/crypto', '@ton/ton'],
         },
-        format: 'es',
-        entryFileNames: 'assets/[name]-[hash].js',
-        chunkFileNames: 'assets/[name]-[hash].js',
-        assetFileNames: 'assets/[name]-[hash].[ext]'
       },
     },
   },
@@ -51,9 +48,6 @@ export default defineConfig({
         secure: true,
         rewrite: (path) => path.replace(/^\/ton/, '')
       }
-    },
-    headers: {
-      'Content-Type': 'application/javascript'
     }
   },
   preview: {

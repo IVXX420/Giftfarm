@@ -6,7 +6,6 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "vercel-build": "npm run build",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
@@ -16,12 +15,9 @@
     "@ton/ton": "^13.11.1",
     "@tonconnect/sdk": "^3.0.0",
     "@tonconnect/ui-react": "^2.0.0",
-    "@types/mongodb": "^4.0.6",
     "@vkruglikov/react-telegram-web-app": "^2.1.9",
     "axios": "^1.6.7",
     "buffer": "^6.0.3",
-    "framer-motion": "^12.5.0",
-    "mongodb": "^6.14.2",
     "mongoose": "^8.2.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

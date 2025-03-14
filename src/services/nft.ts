@@ -177,15 +177,13 @@ class NFTService {
   // Получить список всех NFT на кошельке
   private async fetchAccountNFTs(address: string): Promise<any[]> {
     try {
-      const apiUrl = `${this.apiEndpoint}/nft/items?account=${address}&limit=1000`;
+      const apiUrl = `${this.apiEndpoint}/accounts/${address}/nfts?limit=1000`;
       console.log('Запрашиваем NFT по адресу:', apiUrl);
       
       const response = await fetch(apiUrl, {
-        method: 'GET',
         headers: {
           'Authorization': `Bearer ${this.apiKey}`,
           'Accept': 'application/json',
-          'Content-Type': 'application/json'
         }
       });
 
@@ -199,12 +197,14 @@ class NFTService {
       console.log('Сырой ответ от API:', data);
       
       // Проверяем наличие nft_items в ответе
-      if (!data.nft_items) {
+      if (!data.nft_items && !data.nfts) {
         console.error('Неожиданный формат ответа API:', data);
         return [];
       }
 
-      return data.nft_items;
+      const nfts = data.nft_items || data.nfts || [];
+      console.log('Обработанные NFT из ответа:', nfts);
+      return nfts;
     } catch (error) {
       console.error('Ошибка при получении списка NFT:', error);
       throw error;
